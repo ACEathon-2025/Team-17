@@ -23,6 +23,7 @@ import Collections from './pages/Collections'
 import { EyeComfortProvider } from './context/EyeComfortContext'
 import EyeBreakOverlay from './components/EyeBreakOverlay'
 import Goals from './pages/Goals'
+import ImportText from './pages/ImportText'
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/collections" element={<Collections />} />
                         <Route path="/goals" element={<Goals />} />
+                        <Route path="/import" element={<ImportText />} />
                       </Routes>
                       <EyeBreakOverlay /> 
                     </main>

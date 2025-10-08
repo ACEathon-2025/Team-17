@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useEyeComfort } from '../context/EyeComfortContext'
+import { Upload } from 'lucide-react'
 
 const Navbar = () => {
   const { user, signOut } = useAuth()
@@ -96,6 +97,14 @@ const Navbar = () => {
       description: 'Track your progress',
       gradient: 'from-green-500 to-teal-500',
       color: 'text-green-600 dark:text-green-400'
+    },
+    {
+      name: 'Import Text',
+      href: '/import',
+      icon: Upload,
+      description: 'Upload files or import from URL',
+      gradient: 'from-teal-500 to-cyan-500',
+      color: 'text-teal-600 dark:text-teal-400'
     }
   ]
 

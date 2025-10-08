@@ -10,6 +10,7 @@ import readingRoutes from './routes/readingRoutes.js'
 import translationRoutes from './routes/translationRoutes.js'
 import dictionaryRoutes from './routes/dictionaryRoutes.js';
 import summarizationRoutes from './routes/summarizationRoutes.js';
+import importRoutes from './routes/import.js'
 
 dotenv.config()
 
@@ -95,6 +96,7 @@ app.use('/api/summarization', summarizationRoutes);
 app.use('/api/dictionary', dictionaryRoutes);
 
 app.use('/api/', generalLimiter)
+app.use('/api/import', importRoutes)
 
 
 // Health check endpoint (no rate limit)

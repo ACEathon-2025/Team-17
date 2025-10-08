@@ -105,25 +105,6 @@ const Dashboard = () => {
     }
   }, [readingProgress])
 
-  useEffect(() => {
-    const speedHistory = localStorage.getItem('speed-reading-history')
-    if (speedHistory) {
-      try {
-        const history = JSON.parse(speedHistory)
-        if (history.length > 0) {
-          const avgWPM = Math.round(
-            history.reduce((sum, h) => sum + h.wpm, 0) / history.length
-          )
-          setStats(prev => ({
-            ...prev,
-            averageReadingSpeed: avgWPM
-          }))
-        }
-      } catch (e) {
-        console.error('Error loading speed reading data:', e)
-      }
-    }
-  }, [])
 
   if (!user) {
     return <Navigate to="/login" replace />
