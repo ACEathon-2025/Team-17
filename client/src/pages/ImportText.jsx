@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Image, Link as LinkIcon, Sparkles, AlertCircle } from 'lucide-react'
+import { FileText, Image, Link as LinkIcon, Sparkles, AlertCircle, Mic } from 'lucide-react'
 import FileUploader from '../components/import/FileUploader'
 import URLImporter from '../components/import/URLImporter'
 import ProcessingModal from '../components/import/ProcessingModal'
@@ -197,7 +197,7 @@ const ImportText = () => {
             Import Text from Anywhere
           </h1>
           <p className="text-[var(--text-secondary)] dyslexia-text">
-            Upload documents, extract text from images with OCR, or import articles from URLs
+            Upload documents, extract text from images with OCR, or import articles from URLs 🎤
           </p>
         </div>
 
@@ -299,15 +299,17 @@ const ImportText = () => {
             <div className="space-y-8">
               <URLImporter onImport={handleURLImport} />
 
-              {/* URL Import Info */}
+              {/* URL Import Info with Voice Mention */}
               <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-cyan-200 dark:border-cyan-800">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] dyslexia-text mb-3">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] dyslexia-text mb-3 flex items-center">
+                  <Mic className="h-5 w-5 mr-2" />
                   🌐 How URL Import Works:
                 </h3>
                 <ul className="space-y-2 text-sm text-[var(--text-secondary)] dyslexia-text">
                   <li>✅ Extracts main article content automatically</li>
                   <li>✅ Removes ads, sidebars, and navigation</li>
                   <li>✅ Works best with news sites, blogs, Medium, etc.</li>
+                  <li><strong>🎤 Voice input available</strong> - Speak the URL instead of typing!</li>
                   <li>⚠️ Some sites may block automated access</li>
                   <li>💡 Try copying the article text if import fails</li>
                 </ul>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Focus, Play, Pause, Square, Settings as SettingsIcon, X, ArrowLeft, FileText, Volume2, Brain } from 'lucide-react'
+import { Focus, Play, Pause, Square, Settings as SettingsIcon, X, ArrowLeft, FileText, Volume2, Brain, Mic } from 'lucide-react'
 import { useUser } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import WordTooltip from '../components/WordTooltip'
@@ -9,7 +9,7 @@ import BionicText from '../components/BionicText'
 import BionicToggle from '../components/BionicToggle'
 import SaveToCollection from '../components/SaveToCollection'
 import { goalsService } from '../services/goalsService'
-
+import VoiceButton from '../components/voice/VoiceButton'
 
 const FocusMode = () => {
   const { settings, saveReadingProgress } = useUser()
@@ -60,16 +60,43 @@ const FocusMode = () => {
   }, [])
 
   // Track reading progress for goals
-    useEffect(() => {
-      if (!isPaused && text.trim()) {
-        const interval = setInterval(() => {
-          const wordsRead = text.split(/\s+/).filter(w => w.trim()).length
-          goalsService.updateDailyProgress(wordsRead, 60000) // Update every minute
-        }, 60000) // Every minute
+  useEffect(() => {
+    if (!isPaused && text.trim()) {
+      const interval = setInterval(() => {
+        const wordsRead = text.split(/\s+/).filter(w => w.trim()).length
+        goalsService.updateDailyProgress(wordsRead, 60000) // Update every minute
+      }, 60000) // Every minute
 
-        return () => clearInterval(interval)
-      }
-    }, [isPaused, text])
+      return () => clearInterval(interval)
+    }
+  }, [isPaused, text])
+
+  // Listen for voice commands
+useEffect(() => {
+  const handleVoiceAction = (event) => {
+    const { action } = event.detail
+    
+    switch (action) {
+      case 'startFocus':
+        if (text.trim()) handleStart()
+        break
+      case 'pauseFocus':
+        handlePause()
+        break
+      case 'stopFocus':
+        handleStop()
+        break
+      case 'dictate':
+        setText(prev => prev + ' ' + event.detail.data.text)
+        break
+      default:
+        break
+    }
+  }
+
+  window.addEventListener('voicePageAction', handleVoiceAction)
+  return () => window.removeEventListener('voicePageAction', handleVoiceAction)
+}, [text])
 
 
   // Word click handler for dictionary - WORKS WHEN PAUSED!
@@ -474,15 +501,12 @@ const FocusMode = () => {
                     <Brain className="h-4 w-4" />
                   </button>
 
-
                   <SaveToCollection
                     text={text}
                     title={text.substring(0, 50) + '...'}
                     source="focus-mode"
                     className="ml-2"
                   />
-
-
                 </div>
               </div>
 
@@ -496,18 +520,31 @@ const FocusMode = () => {
                 />
               </div>
               
-              {/* Edit Mode - Textarea */}
+              {/* Edit Mode - Textarea with Voice Input */}
               {!readMode && (
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Paste your text here to begin reading in focus mode..."
-                  className="w-full h-48 p-4 bg-gray-900 border border-gray-700 rounded-lg text-white dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  style={{
-                    lineHeight: '1.8',
-                    letterSpacing: '0.05em'
-                  }}
-                />
+                <div className="relative">
+                  <textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Paste, type, or speak your text here to begin reading in focus mode... 🎤"
+                    className="w-full h-48 p-4 pr-14 bg-gray-900 border border-gray-700 rounded-lg text-white dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style={{
+                      lineHeight: '1.8',
+                      letterSpacing: '0.05em'
+                    }}
+                  />
+
+                  {/* Voice Input Button - NEW */}
+                  <div className="absolute bottom-4 right-4">
+                    <VoiceButton
+                      mode="typing"
+                      onTranscript={(transcript) => {
+                        setText(transcript)
+                      }}
+                      size="md"
+                    />
+                  </div>
+                </div>
               )}
 
               {/* Read Mode - Clickable Text with Bionic */}
@@ -528,8 +565,9 @@ const FocusMode = () => {
               )}
 
               <div className="flex items-center justify-between mt-4">
-                <span className="text-sm text-gray-400 dyslexia-text">
-                  {readMode ? '📖 Read mode - Click words for definitions' : '✏️ Edit mode - Type or paste text'}
+                <span className="text-sm text-gray-400 dyslexia-text flex items-center">
+                  <Mic className="h-4 w-4 mr-1" />
+                  {readMode ? '📖 Read mode - Click words for definitions' : '✏️ Edit mode - Type, paste, or speak 🎤'}
                   {bionicEnabled && ' ⚡ Bionic mode active'}
                    • {text.split(' ').filter(w => w.trim()).length} words
                 </span>

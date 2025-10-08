@@ -13,12 +13,13 @@ import {
   CheckCircle2,
   ArrowLeftRight,
   Zap,
-  Globe
+  Globe,
+  Mic
 } from 'lucide-react';
 import { translationService } from '../services/translationService.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { goalsService } from '../services/goalsService'
-
+import { goalsService } from '../services/goalsService';
+import VoiceButton from '../components/voice/VoiceButton';
 
 // Safe settings hook with fallback
 const useSettingsSafe = () => {
@@ -31,10 +32,7 @@ const useSettingsSafe = () => {
 };
 
 const Translation = () => {
-  // Use ThemeContext for dark mode (synced with navbar)
   const { isDark } = useTheme();
-  
-  // Get settings safely
   const storedSettings = useSettingsSafe();
 
   const [sourceText, setSourceText] = useState('');
@@ -63,7 +61,6 @@ const Translation = () => {
     checkServer();
   }, []);
 
-  // Listen for settings updates
   useEffect(() => {
     const handleSettingsUpdate = (event) => {
       const newSettings = event.detail;
@@ -94,6 +91,31 @@ const Translation = () => {
     return () => clearTimeout(timer);
   }, [sourceText, targetLanguage, autoTranslate]);
 
+  // Listen for voice commands
+  useEffect(() => {
+    const handleVoiceAction = (event) => {
+      const { action, data } = event.detail
+      
+      switch (action) {
+        case 'translate':
+          handleTranslate()
+          break
+        case 'setLanguage':
+          setTargetLanguage(data.language)
+          break
+        case 'dictate':
+          setSourceText(prev => prev + ' ' + data.text)
+          break
+        default:
+          break
+      }
+    }
+
+    window.addEventListener('voicePageAction', handleVoiceAction)
+    return () => window.removeEventListener('voicePageAction', handleVoiceAction)
+  }, [])
+
+
   const handleTranslate = async () => {
     if (!sourceText.trim()) return;
 
@@ -109,6 +131,9 @@ const Translation = () => {
       if (result.success) {
         setTranslatedText(result.translatedText);
         setDetectedLanguage(result.detectedLanguage);
+        
+        // Update challenge progress
+        goalsService.updateChallengeProgress('translations', 1);
       } else {
         if (result.error.includes('Rate limit') || result.error.includes('Daily limit')) {
           setError('⏱️ Daily limit reached (50,000 chars). Try again tomorrow!');
@@ -123,10 +148,6 @@ const Translation = () => {
     } finally {
       setLoading(false);
     }
-    if (translatedText) {
-    // Update challenge progress
-    goalsService.updateChallengeProgress('translations', 1)
-  }
   };
 
   const handleCopy = async (text) => {
@@ -199,7 +220,7 @@ const Translation = () => {
             Free AI Translation
           </h1>
           <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-            Powered by MyMemory • 50,000 characters free daily
+            Powered by MyMemory • 50,000 characters free daily 🎤
           </p>
         </motion.div>
 
@@ -413,24 +434,38 @@ const Translation = () => {
               </div>
             </div>
 
-            <textarea
-              value={sourceText}
-              onChange={(e) => setSourceText(e.target.value)}
-              placeholder="Type or paste your text here..."
-              className={`w-full h-72 p-4 border rounded-xl resize-none transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isDark 
-                  ? 'bg-gray-900/50 border-gray-600 text-white placeholder-gray-500' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
-              }`}
-              style={{
-                lineHeight: '1.8',
-                fontSize: '1.05rem',
-                fontFamily: 'OpenDyslexic, Arial, sans-serif'
-              }}
-            />
+            <div className="relative">
+              <textarea
+                value={sourceText}
+                onChange={(e) => setSourceText(e.target.value)}
+                placeholder="Type, paste, or speak your text here... 🎤"
+                className={`w-full h-72 p-4 pr-14 border rounded-xl resize-none transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isDark 
+                    ? 'bg-gray-900/50 border-gray-600 text-white placeholder-gray-500' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                }`}
+                style={{
+                  lineHeight: '1.8',
+                  fontSize: '1.05rem',
+                  fontFamily: 'OpenDyslexic, Arial, sans-serif'
+                }}
+              />
+
+              {/* Voice Input Button - NEW */}
+              <div className="absolute bottom-4 right-4">
+                <VoiceButton
+                  mode="typing"
+                  onTranscript={(transcript) => {
+                    setSourceText(transcript)
+                  }}
+                  size="md"
+                />
+              </div>
+            </div>
 
             <div className="flex items-center justify-between mt-4">
-              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span className={`text-sm flex items-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                <Mic className="h-4 w-4 mr-1" />
                 {sourceText.length} characters
               </span>
               {sourceText.trim().length > 0 && !autoTranslate && (
@@ -644,6 +679,12 @@ const Translation = () => {
                 isDark ? 'bg-blue-400' : 'bg-blue-600'
               }`}></span>
               <span>Optional auto-translate mode for instant results as you type</span>
+            </li>
+            <li className="flex items-start">
+              <span className={`inline-block w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${
+                isDark ? 'bg-blue-400' : 'bg-blue-600'
+              }`}></span>
+              <span><strong>🎤 Voice input available</strong> - Speak instead of typing!</span>
             </li>
             <li className="flex items-start">
               <span className={`inline-block w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${

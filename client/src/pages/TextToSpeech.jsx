@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Play, Pause, Square, Upload, Volume2, Settings, Download, Copy, RotateCcw, Sliders, CheckCircle, AlertCircle, Loader, Heart, X, Zap, FileText, Brain } from 'lucide-react'
+import { Play, Pause, Square, Upload, Volume2, Settings, Download, Copy, RotateCcw, Sliders, CheckCircle, AlertCircle, Loader, Heart, X, Zap, FileText, Brain, Mic } from 'lucide-react'
 import { ttsService } from '../utils/textToSpeech.js'
 import { useUser } from '../context/UserContext.jsx'
 import WordTooltip from '../components/WordTooltip'
@@ -11,8 +11,7 @@ import BionicText from '../components/BionicText'
 import BionicToggle from '../components/BionicToggle'
 import SaveToCollection from '../components/SaveToCollection'
 import { goalsService } from '../services/goalsService'
-
-
+import VoiceButton from '../components/voice/VoiceButton'
 
 const TextToSpeech = () => {
   const { saveReadingProgress } = useUser()
@@ -83,6 +82,34 @@ const TextToSpeech = () => {
       setTimeout(() => setSuccess(''), 3000)
     }
   }, [])
+
+// Listen for voice commands
+useEffect(() => {
+  const handleVoiceAction = (event) => {
+    const { action } = event.detail
+    
+    switch (action) {
+      case 'play':
+        handleSpeak()
+        break
+      case 'pause':
+        handleStop()
+        break
+      case 'clear':
+        handleClear()
+        break
+      case 'dictate':
+        setText(prev => prev + ' ' + event.detail.data.text)
+        break
+      default:
+        break
+    }
+  }
+
+  window.addEventListener('voicePageAction', handleVoiceAction)
+  return () => window.removeEventListener('voicePageAction', handleVoiceAction)
+}, [])
+
 
   const handleAnalyzeSentiment = () => {
     if (!text.trim()) {
@@ -162,7 +189,6 @@ const TextToSpeech = () => {
             sessionType: 'text-to-speech'
           })
         },
-
         onPause: () => setIsPaused(true),
         onResume: () => setIsPaused(false),
         onError: (error) => {
@@ -322,7 +348,7 @@ const TextToSpeech = () => {
             Text to Speech
           </h1>
           <p className="text-[var(--text-secondary)] dyslexia-text">
-            Convert any text into natural-sounding speech with customizable voice settings
+            Convert any text into natural-sounding speech with customizable voice settings 🎤
           </p>
         </div>
 
@@ -395,7 +421,6 @@ const TextToSpeech = () => {
                     source="text-to-speech"
                   />
 
-
                   <button
                     onClick={() => {
                       if (text.trim()) {
@@ -445,18 +470,31 @@ const TextToSpeech = () => {
               </div>
               
               {!readMode && !isPlaying && (
-                <textarea
-                  ref={textareaRef}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Paste or type your text here, or upload a text file..."
-                  className="w-full h-64 p-4 border border-[var(--border-color)] rounded-lg bg-[var(--bg-primary)] text-[var(--text-primary)] dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  style={{
-                    lineHeight: '1.8',
-                    letterSpacing: '0.05em'
-                  }}
-                  maxLength={5000}
-                />
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Paste or type your text here, upload a file, or use voice input 🎤..."
+                    className="w-full h-64 p-4 pr-16 border border-[var(--border-color)] rounded-lg bg-[var(--bg-primary)] text-[var(--text-primary)] dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    style={{
+                      lineHeight: '1.8',
+                      letterSpacing: '0.05em'
+                    }}
+                    maxLength={5000}
+                  />
+                  
+                  {/* Voice Input Button - NEW */}
+                  <div className="absolute bottom-4 right-4">
+                    <VoiceButton
+                      mode="typing"
+                      onTranscript={(transcript) => {
+                        setText(prev => prev + (prev ? ' ' : '') + transcript)
+                      }}
+                      size="lg"
+                    />
+                  </div>
+                </div>
               )}
 
               {readMode && !isPlaying && (
@@ -509,7 +547,7 @@ const TextToSpeech = () => {
               
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-[var(--text-secondary)] dyslexia-text">
-                  {isPlaying ? '▶️ Playing...' : readMode ? '📖 Read mode - Click words for definitions' : '✏️ Edit mode - Type or paste text'}
+                  {isPlaying ? '▶️ Playing...' : readMode ? '📖 Read mode - Click words for definitions' : '✏️ Edit mode - Type, paste, or speak 🎤'}
                   {bionicEnabled && ' ⚡ Bionic mode active'}
                 </p>
                 <span className="text-sm text-[var(--text-secondary)] dyslexia-text">
@@ -732,6 +770,19 @@ const TextToSpeech = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Voice Input Info - NEW */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center space-x-2 mb-2">
+                <Mic className="h-5 w-5 text-purple-600" />
+                <h4 className="font-semibold text-purple-900 dark:text-purple-100 dyslexia-text">
+                  Voice Input Available!
+                </h4>
+              </div>
+              <p className="text-sm text-purple-800 dark:text-purple-200 dyslexia-text">
+                Click the microphone button to speak your text instead of typing. Perfect for hands-free input!
+              </p>
             </div>
           </div>
         </div>

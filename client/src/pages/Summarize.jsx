@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   FileText, Upload, Copy, RotateCcw, CheckCircle, AlertCircle, Loader, 
-  Zap, TrendingDown, Clock, ArrowRight, Volume2, Focus, Share2, Download, Brain, Bookmark
+  Zap, TrendingDown, Clock, ArrowRight, Volume2, Focus, Share2, Download, Brain, Bookmark, Mic
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { summarizationService } from '../services/summarizationService'
@@ -13,6 +13,7 @@ import BionicText from '../components/BionicText'
 import BionicToggle from '../components/BionicToggle'
 import { collectionsService } from '../services/collectionsService'
 import { goalsService } from '../services/goalsService'
+import VoiceButton from '../components/voice/VoiceButton'
 
 const Summarize = () => {
   const navigate = useNavigate()
@@ -40,6 +41,33 @@ const Summarize = () => {
       setTimeout(() => setSuccess(''), 3000)
     }
   }, [])
+
+  // Listen for voice commands
+  useEffect(() => {
+    const handleVoiceAction = (event) => {
+      const { action, data } = event.detail
+      
+      switch (action) {
+        case 'summarize':
+          if (text.trim()) {
+            handleSummarize()
+          }
+          break
+        case 'clear':
+          handleClear()
+          break
+        case 'dictate':
+          setText(prev => prev + ' ' + data.text)
+          break
+        default:
+          break
+      }
+    }
+
+    window.addEventListener('voicePageAction', handleVoiceAction)
+    return () => window.removeEventListener('voicePageAction', handleVoiceAction)
+  }, [text])
+
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0]
@@ -201,7 +229,7 @@ const Summarize = () => {
             AI-Powered Summarization
           </h1>
           <p className="text-[var(--text-secondary)] dyslexia-text">
-            Extract key points from long texts instantly using advanced AI
+            Extract key points from long texts instantly using advanced AI 🎤
           </p>
         </div>
 
@@ -268,18 +296,31 @@ const Summarize = () => {
                 </div>
               </div>
 
-              <textarea
-                ref={textareaRef}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Paste or type your long text here... (minimum 50 words)"
-                className="w-full h-64 p-4 border border-[var(--border-color)] rounded-lg bg-[var(--bg-primary)] text-[var(--text-primary)] dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                style={{
-                  lineHeight: '1.8',
-                  letterSpacing: '0.05em'
-                }}
-                maxLength={10000}
-              />
+              <div className="relative">
+                <textarea
+                  ref={textareaRef}
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Paste, type, or speak your long text here... (minimum 50 words) 🎤"
+                  className="w-full h-64 p-4 pr-14 border border-[var(--border-color)] rounded-lg bg-[var(--bg-primary)] text-[var(--text-primary)] dyslexia-text resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  style={{
+                    lineHeight: '1.8',
+                    letterSpacing: '0.05em'
+                  }}
+                  maxLength={10000}
+                />
+
+                {/* Voice Input Button - NEW */}
+                <div className="absolute bottom-4 right-4">
+                  <VoiceButton
+                    mode="typing"
+                    onTranscript={(transcript) => {
+                      setText(prev => prev + (prev ? ' ' : '') + transcript)
+                    }}
+                    size="md"
+                  />
+                </div>
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -290,7 +331,8 @@ const Summarize = () => {
               />
 
               <div className="flex items-center justify-between mt-4">
-                <span className="text-sm text-[var(--text-secondary)] dyslexia-text">
+                <span className="text-sm text-[var(--text-secondary)] dyslexia-text flex items-center">
+                  <Mic className="h-4 w-4 mr-1" />
                   {text.split(/\s+/).filter(w => w.trim()).length} words • {text.length}/10000 characters
                 </span>
                 <div className="text-sm text-[var(--text-secondary)] dyslexia-text">
@@ -538,6 +580,10 @@ const Summarize = () => {
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
                   <span>⚡ Bionic mode for faster reading</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>🎤 Voice input available</strong> - Speak to add text!</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>

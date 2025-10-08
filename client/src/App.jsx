@@ -18,13 +18,65 @@ import Register from './pages/Register.jsx'
 import Summarize from './pages/Summarize.jsx'
 import Quiz from './pages/Quiz.jsx'
 import SpeedReading from './pages/SpeedReading.jsx'
+import VoiceCommands from './pages/VoiceCommands.jsx'
 import { BionicProvider } from './context/BionicContext'
 import Collections from './pages/Collections'
 import { EyeComfortProvider } from './context/EyeComfortContext'
 import EyeBreakOverlay from './components/EyeBreakOverlay'
 import Goals from './pages/Goals'
 import ImportText from './pages/ImportText'
+import { useVoiceCommands } from './hooks/useVoiceCommands'
+import FloatingVoiceButton from './components/voice/FloatingVoiceButton'
 
+// Global Voice Commands Component
+function GlobalVoiceCommands() {
+  const { 
+    transcript, 
+    listening, 
+    stopListening 
+  } = useVoiceCommands(true) // Always enabled globally
+
+  return (
+    <FloatingVoiceButton
+      listening={listening}
+      onStop={stopListening}
+      transcript={transcript}
+    />
+  )
+}
+
+// Main App Content
+function AppContent() {
+  return (
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/text-to-speech" element={<TextToSpeech />} />
+          <Route path="/translation" element={<Translation />} />
+          <Route path="/focus-mode" element={<FocusMode />} />
+          <Route path="/summarize" element={<Summarize />} />
+          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/speed-reading" element={<SpeedReading />} />
+          <Route path="/voice-commands" element={<VoiceCommands />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/import" element={<ImportText />} />
+        </Routes>
+        <EyeBreakOverlay />
+      </main>
+      <Footer />
+      
+      {/* Global Floating Voice Button */}
+      <GlobalVoiceCommands />
+    </div>
+  )
+}
 
 function App() {
   useEffect(() => {
@@ -47,31 +99,9 @@ function App() {
         <UserProvider>
           <SettingsProvider>
             <BionicProvider>
-               <EyeComfortProvider>
+              <EyeComfortProvider>
                 <Router>
-                  <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
-                    <Navbar />
-                    <main>
-                      <Routes>
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/text-to-speech" element={<TextToSpeech />} />
-                        <Route path="/translation" element={<Translation />} />
-                        <Route path="/focus-mode" element={<FocusMode />} />
-                        <Route path="/summarize" element={<Summarize />} />
-                        <Route path="/quiz" element={<Quiz />} />
-                        <Route path="/speed-reading" element={<SpeedReading />} /> {/* NEW! */}
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/collections" element={<Collections />} />
-                        <Route path="/goals" element={<Goals />} />
-                        <Route path="/import" element={<ImportText />} />
-                      </Routes>
-                      <EyeBreakOverlay /> 
-                    </main>
-                    <Footer />
-                  </div>
+                  <AppContent />
                 </Router>
               </EyeComfortProvider>
             </BionicProvider>
