@@ -1,0 +1,31 @@
+<!-- client/index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOXA - Making Reading Accessible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.ttf" rel="preload" as="font" type="font/ttf" crossorigin>
+    <style>
+      @font-face {
+        font-family: 'OpenDyslexic';
+        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+      
+      @font-face {
+        font-family: 'OpenDyslexic';
+        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
