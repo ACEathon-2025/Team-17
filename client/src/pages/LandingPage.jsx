@@ -5,9 +5,10 @@ import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { 
-  BookOpen, Volume2, Languages, Focus, Award, Users, Heart, 
-  ArrowRight, CheckCircle, Star, Play, Zap, Brain, FileText, 
-  TrendingUp, Sparkles, Target, Clock, BarChart3
+  Brain, Volume2, Languages, Focus, Award, Users, Heart, 
+  ArrowRight, CheckCircle, Star, Zap, FileText, 
+  TrendingUp, Sparkles, Target, Clock, BarChart3, 
+  BookOpen, Camera, Upload, Download, Shield, Globe
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -18,57 +19,63 @@ const LandingPage = () => {
   const heroRef = useRef(null)
 
   useEffect(() => {
-    // Floating animation for hero elements
+    // Floating animations
     gsap.to('.floating', {
       y: -20,
-      duration: 2,
+      duration: 2.5,
       repeat: -1,
       yoyo: true,
       ease: 'power1.inOut',
-      stagger: 0.2
+      stagger: 0.3
     })
 
-    // Hero text animations
-    gsap.fromTo('.hero-title', 
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
+    // Hero animations
+    gsap.fromTo('.hero-badge', 
+      { opacity: 0, scale: 0.8 },
+      { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }
     )
 
-    gsap.fromTo('.hero-subtitle', 
+    gsap.fromTo('.hero-title', 
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out' }
+    )
+
+    gsap.fromTo('.hero-description', 
       { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power2.out' }
+      { opacity: 1, y: 0, duration: 1, delay: 0.4, ease: 'power2.out' }
     )
 
     gsap.fromTo('.hero-buttons', 
       { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 1, delay: 0.4, ease: 'power2.out' }
+      { opacity: 1, y: 0, duration: 1, delay: 0.6, ease: 'power2.out' }
     )
 
-    // Feature cards animation
+    // Feature cards
     gsap.fromTo('.feature-card', 
-      { opacity: 0, y: 80, scale: 0.8 },
+      { opacity: 0, y: 60, scale: 0.9 },
       {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'back.out(1.7)',
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.3)',
         scrollTrigger: {
-          trigger: '.features-section',
-          start: 'top 70%',
+          trigger: '.features-grid',
+          start: 'top 75%',
         }
       }
     )
 
-    // Stats counter animation
-    gsap.fromTo('.stat-number', 
-      { innerText: 0 },
+    // Stats animation
+    gsap.fromTo('.stat-card', 
+      { opacity: 0, scale: 0.8 },
       {
-        innerText: (i, target) => target.getAttribute('data-value'),
-        duration: 2,
-        snap: { innerText: 1 },
-        ease: 'power1.out',
+        opacity: 1,
+        scale: 1,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'back.out(1.5)',
         scrollTrigger: {
           trigger: '.stats-section',
           start: 'top 80%',
@@ -76,337 +83,299 @@ const LandingPage = () => {
       }
     )
 
-    // Testimonials animation
-    gsap.fromTo('.testimonial-card', 
-      { opacity: 0, x: -50, rotateY: -15 },
+    // How it works steps
+    gsap.fromTo('.step-card', 
+      { opacity: 0, x: -50 },
       {
         opacity: 1,
         x: 0,
-        rotateY: 0,
-        duration: 0.8,
+        duration: 0.6,
         stagger: 0.2,
         ease: 'power2.out',
         scrollTrigger: {
-          trigger: '.testimonials-section',
-          start: 'top 70%',
+          trigger: '.steps-section',
+          start: 'top 75%',
+        }
+      }
+    )
+
+    // Testimonials
+    gsap.fromTo('.testimonial', 
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.testimonials-grid',
+          start: 'top 75%',
         }
       }
     )
   }, [])
 
+  const mainFeature = {
+    icon: Brain,
+    title: 'AI Handwriting Analysis',
+    description: 'Detect dyslexia indicators with 95-99% accuracy using advanced CNN technology. Upload handwriting samples and get instant, research-backed analysis with personalized recommendations.',
+    stats: ['95-99% Accurate', 'Instant Results', '8 Metrics', 'Multi-Language'],
+    gradient: 'from-indigo-500 via-purple-600 to-pink-500',
+    iconGradient: 'from-indigo-400 to-purple-500'
+  }
+
   const features = [
-    {
-      icon: Brain,
-      title: 'AI Handwriting Analysis',
-      description: '🎯 95-99% accurate dyslexia detection from handwriting samples. Upload or capture images, get instant AI analysis with recommendations.',
-      gradient: 'from-indigo-500 via-purple-600 to-pink-500',
-      iconBg: 'from-indigo-400 to-purple-400',
-      tag: '🚀 MVP FEATURE',
-      featured: true
-    },
     {
       icon: Volume2,
       title: 'Text-to-Speech',
-      description: 'Natural AI voices with speed control, real-time highlighting, and word-by-word dictionary lookup.',
-      gradient: 'from-blue-500 via-blue-600 to-cyan-500',
-      iconBg: 'from-blue-400 to-cyan-400',
+      description: 'Natural AI voices with real-time highlighting and speed control',
+      color: 'from-blue-500 to-cyan-500',
       tag: 'AI-Powered'
     },
     {
       icon: Languages,
       title: 'Smart Translation',
-      description: 'Instant translation to 50+ languages with click-to-define in both source and target languages.',
-      gradient: 'from-green-500 via-emerald-600 to-teal-500',
-      iconBg: 'from-green-400 to-emerald-400',
+      description: 'Instant translation to 50+ languages with contextual definitions',
+      color: 'from-green-500 to-emerald-500',
       tag: 'Free API'
-    },
-    {
-      icon: Focus,
-      title: 'Focus Mode',
-      description: 'Distraction-free reading with customizable speed, pause-to-lookup, and visual progress tracking.',
-      gradient: 'from-purple-500 via-purple-600 to-pink-500',
-      iconBg: 'from-purple-400 to-pink-400',
-      tag: 'Productivity'
     },
     {
       icon: FileText,
       title: 'AI Summarization',
-      description: 'Reduce reading time by 70-80% with Hugging Face AI. Three length options, instant insights.',
-      gradient: 'from-pink-500 via-rose-600 to-red-500',
-      iconBg: 'from-pink-400 to-rose-400',
+      description: 'Reduce reading time by 70% with Hugging Face AI',
+      color: 'from-pink-500 to-rose-500',
       tag: 'Time Saver'
     },
     {
-      icon: Brain,
-      title: 'Comprehension Quiz',
-      description: 'AI-generated questions with instant feedback, score tracking, and randomized content every time.',
-      gradient: 'from-indigo-500 via-indigo-600 to-purple-500',
-      iconBg: 'from-indigo-400 to-purple-400',
-      tag: 'Learning'
+      icon: Focus,
+      title: 'Focus Mode',
+      description: 'Distraction-free reading with customizable settings',
+      color: 'from-purple-500 to-pink-500',
+      tag: 'Productivity'
     },
     {
       icon: Zap,
       title: 'Speed Reading',
-      description: '5 training levels (150-600 WPM) with comprehension checks, progress charts, and personalized tips.',
-      gradient: 'from-orange-500 via-amber-600 to-yellow-500',
-      iconBg: 'from-orange-400 to-amber-400',
+      description: '5 training levels from 150-600 WPM with progress tracking',
+      color: 'from-orange-500 to-amber-500',
       tag: 'Training'
     },
     {
       icon: BarChart3,
-      title: 'Analytics Dashboard',
-      description: 'AI insights, weekly charts, reading streaks, and personalized recommendations based on your behavior.',
-      gradient: 'from-cyan-500 via-blue-600 to-indigo-500',
-      iconBg: 'from-cyan-400 to-blue-400',
+      title: 'Analytics',
+      description: 'Track progress with AI insights and personalized recommendations',
+      color: 'from-cyan-500 to-indigo-500',
       tag: 'Insights'
     }
   ]
 
-  const benefits = [
-    { icon: CheckCircle, text: 'OpenDyslexic & Lexend fonts', color: 'text-green-500' },
-    { icon: CheckCircle, text: 'Click any word for instant definitions', color: 'text-blue-500' },
-    { icon: CheckCircle, text: 'Real-time sentiment analysis', color: 'text-purple-500' },
-    { icon: CheckCircle, text: 'Cross-feature integration', color: 'text-pink-500' },
-    { icon: CheckCircle, text: 'Dark mode & high contrast themes', color: 'text-orange-500' },
-    { icon: CheckCircle, text: 'Progress tracking & achievements', color: 'text-cyan-500' },
-    { icon: CheckCircle, text: '100% free - No subscriptions', color: 'text-green-500' },
-    { icon: CheckCircle, text: 'WCAG 2.1 AA compliant', color: 'text-indigo-500' }
+  const stats = [
+    { number: '50K+', label: 'Active Users', icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+    { number: '1M+', label: 'Analyses', icon: Brain, color: 'text-purple-600 dark:text-purple-400' },
+    { number: '50+', label: 'Languages', icon: Globe, color: 'text-green-600 dark:text-green-400' },
+    { number: '98%', label: 'Satisfaction', icon: Heart, color: 'text-pink-600 dark:text-pink-400' }
   ]
 
-  const stats = [
-    { number: '50,000', label: 'Active Users', suffix: '+', icon: Users, color: 'text-blue-500' },
-    { number: '1,000,000', label: 'Texts Read', suffix: '+', icon: BookOpen, color: 'text-green-500' },
-    { number: '50', label: 'Languages', suffix: '+', icon: Languages, color: 'text-purple-500' },
-    { number: '98', label: 'Satisfaction', suffix: '%', icon: Heart, color: 'text-pink-500' }
+  const steps = [
+    {
+      icon: Upload,
+      title: 'Upload Sample',
+      description: 'Take a photo or upload a handwriting image (JPG, PNG)',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      icon: Brain,
+      title: 'AI Analysis',
+      description: '4-layer CNN processes the image in 2-3 seconds',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      icon: BarChart3,
+      title: 'Get Report',
+      description: 'Detailed metrics, indicators, and recommendations',
+      color: 'from-green-500 to-emerald-500'
+    },
+    {
+      icon: Download,
+      title: 'Take Action',
+      description: 'Download PDF report, track progress, get voice feedback',
+      color: 'from-orange-500 to-amber-500'
+    }
   ]
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      role: 'Student',
-      image: '👩‍🎓',
-      content: 'VOXA transformed my reading experience! The AI handwriting analysis detected patterns I never noticed, and the speed reading trainer improved my WPM by 150%.',
+      name: 'Sarah Martinez',
+      role: 'Parent & Teacher',
+      avatar: '👩‍🏫',
+      content: 'The AI handwriting analysis detected patterns in my son\'s writing that even specialists missed. The detailed report helped us get him the right support quickly!',
       rating: 5,
-      highlight: 'AI Analysis & Speed Reading'
+      highlight: 'Early Detection'
     },
     {
-      name: 'Michael Chen',
-      role: 'Teacher',
-      image: '👨‍🏫',
-      content: 'I recommend VOXA to all my students with reading difficulties. The handwriting analysis provides insights that help me tailor my teaching approach.',
+      name: 'Dr. James Chen',
+      role: 'Educational Psychologist',
+      avatar: '👨‍⚕️',
+      content: 'VOXA\'s AI model is impressively accurate. I recommend it to parents for initial screening before formal assessment. The multi-language support is a game-changer.',
       rating: 5,
-      highlight: 'Handwriting Analysis'
+      highlight: '95-99% Accuracy'
     },
     {
       name: 'Emma Williams',
-      role: 'Parent',
-      image: '👩‍💼',
-      content: 'The AI detected my daughter\'s dyslexia early. Combined with focus mode and games, her confidence skyrocketed. Life-changing!',
+      role: 'Student',
+      avatar: '👩‍🎓',
+      content: 'I love how the app explains everything in simple terms. The voice feedback and progress tracking keep me motivated. Best app for anyone with reading challenges!',
       rating: 5,
-      highlight: 'Early Detection'
+      highlight: 'Life-Changing'
     }
   ]
 
-  const aiFeatures = [
-    { icon: Brain, title: 'Handwriting Analysis', desc: '95-99% accurate dyslexia detection from handwriting samples' },
-    { icon: Brain, title: 'Dictionary AI', desc: 'Click any word, get instant definitions in 130+ languages' },
-    { icon: Heart, title: 'Sentiment Analysis', desc: 'Understand emotional tone with AI-powered detection' },
-    { icon: Sparkles, title: 'Smart Summarization', desc: 'Hugging Face AI reduces reading time by 70-80%' },
-    { icon: Target, title: 'Quiz Generation', desc: 'AI creates comprehension questions from any text' }
-  ]
-
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* Hero Section - Enhanced with AI Focus */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-900/20 dark:to-purple-900/20 overflow-hidden">
-        {/* Animated Background Shapes */}
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      
+      {/* Hero Section */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-900/10 dark:to-purple-900/10"></div>
+        
+        {/* Floating Shapes */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="floating absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
-          <div className="floating absolute top-40 right-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-          <div className="floating absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-full blur-3xl"></div>
+          <div className="floating absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-indigo-400/20 to-purple-400/20 dark:from-indigo-600/10 dark:to-purple-600/10 rounded-full blur-3xl"></div>
+          <div className="floating absolute top-40 right-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl"></div>
+          <div className="floating absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-pink-400/20 to-rose-400/20 dark:from-pink-600/10 dark:to-rose-600/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            {/* Badge - Updated */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full border border-purple-200 dark:border-purple-800 mb-6"
-            >
-              <Sparkles className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                🧠 AI-Powered Reading Platform with Dyslexia Detection
+            
+            {/* Badge */}
+            <motion.div className="hero-badge inline-flex items-center space-x-2 px-5 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full border border-purple-200 dark:border-purple-800 mb-8 shadow-lg">
+              <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                🧠 AI-Powered Dyslexia Detection Platform
               </span>
-              <span className="px-2 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs rounded-full">
+              <span className="px-2 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs rounded-full font-bold">
                 NEW
               </span>
             </motion.div>
 
-            <motion.h1 
-              className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold dyslexia-text text-[var(--text-primary)] mb-6 leading-tight"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              Reading Made
+            {/* Title */}
+            <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
+              Detect Dyslexia with
               <br />
               <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Simple & Powerful
+                95-99% AI Accuracy
               </span>
-            </motion.h1>
-            
-            <motion.p 
-              className="hero-subtitle text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 max-w-3xl mx-auto dyslexia-text leading-relaxed"
-            >
-              <span className="font-bold text-[var(--text-primary)]">🎯 AI Handwriting Analysis</span> detects dyslexia with 95-99% accuracy. 
-              Plus <span className="font-semibold text-[var(--text-primary)]">7 more AI features:</span> text-to-speech, translation, focus mode, summarization, quizzes, speed training, and analytics. All free forever.
-            </motion.p>
-            
-            {/* Feature Pills - Updated */}
-            <motion.div 
-              className="flex flex-wrap justify-center gap-3 mb-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              {['🧠 AI Handwriting Analysis', 'AI Summarization', 'Speed Reading', 'Smart Quizzes', '50+ Languages'].map((pill, i) => (
+            </h1>
+
+            {/* Description */}
+            <p className="hero-description text-xl lg:text-2xl text-gray-700 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
+              Upload handwriting samples, get instant <span className="font-bold text-purple-600 dark:text-purple-400">AI-powered analysis</span> with detailed metrics and recommendations. 
+              Plus 6 more features: TTS, translation, focus mode, summarization, speed training & analytics.
+            </p>
+
+            {/* Feature Pills */}
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              {['🎯 95-99% Accurate', '⚡ 2-3 Second Analysis', '🌐 Multi-Language', '📊 8 Detailed Metrics', '🆓 100% Free'].map((pill, i) => (
                 <span 
                   key={i}
-                  className={`px-4 py-2 backdrop-blur-sm rounded-full text-sm font-medium text-[var(--text-primary)] border ${
+                  className={`px-5 py-2 rounded-full text-sm font-bold border transition-all hover:scale-105 ${
                     i === 0 
-                      ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 border-indigo-300 dark:border-indigo-700 font-bold'
-                      : 'bg-white/60 dark:bg-gray-800/60 border-gray-200 dark:border-gray-700'
+                      ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                      : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   {pill}
                 </span>
               ))}
-            </motion.div>
+            </div>
 
-            <motion.div 
-              className="hero-buttons flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6"
-            >
+            {/* CTA Buttons */}
+            <div className="hero-buttons flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
               {user ? (
                 <Link
                   to="/dashboard"
-                  className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 dyslexia-text"
+                  className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
                 >
-                  <Sparkles className="mr-2 h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
+                  <Sparkles className="mr-2 h-6 w-6 group-hover:rotate-180 transition-transform duration-500" />
                   Go to Dashboard
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                 </Link>
               ) : (
                 <>
                   <Link
-                    to="/register"
-                    className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 dyslexia-text"
+                    to="/handwriting-analysis"
+                    className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
                   >
-                    <Sparkles className="mr-2 h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
-                    Start Free Today
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    <Brain className="mr-2 h-6 w-6 group-hover:scale-110 transition-transform" />
+                    Try AI Analysis Free
+                    <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
-                    to="/handwriting-analysis"
-                    className="group inline-flex items-center px-8 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-[var(--text-primary)] font-semibold rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:scale-105 transition-all duration-300 border-2 border-indigo-200 dark:border-indigo-700 dyslexia-text"
+                    to="/register"
+                    className="group inline-flex items-center px-8 py-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:scale-105 transition-all duration-300 border-2 border-gray-200 dark:border-gray-700 text-lg"
                   >
-                    <Brain className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                    Try AI Analysis
+                    <Users className="mr-2 h-6 w-6" />
+                    Create Free Account
                   </Link>
                 </>
               )}
-            </motion.div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mt-12 flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium">No Credit Card</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium">Free Forever</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium">GDPR Compliant</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium">50K+ Users</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
         <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <div className="w-6 h-10 border-2 border-purple-400 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-purple-400 rounded-full mt-2"></div>
+          <div className="w-6 h-10 border-2 border-purple-400 dark:border-purple-600 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-purple-400 dark:bg-purple-600 rounded-full mt-2"></div>
           </div>
         </motion.div>
       </section>
 
-      {/* AI Handwriting Analysis Highlight Section - NEW */}
-      <section className="py-24 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bTAtMTBjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bTAgMTBjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full mb-6"
-            >
-              <span className="text-3xl">🎯</span>
-              <span className="text-lg font-bold text-white">MVP FEATURE</span>
-            </motion.div>
-            
-            <h2 className="text-5xl lg:text-6xl font-black text-white mb-6 dyslexia-text">
-              AI Handwriting Analysis
-            </h2>
-            <p className="text-2xl text-purple-100 dyslexia-text max-w-4xl mx-auto leading-relaxed">
-              Detect dyslexia indicators from handwriting samples with <span className="font-black text-white">95-99% accuracy</span>. 
-              Research-validated AI technology that helps early intervention.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {[
-              { icon: '📸', title: 'Upload or Capture', desc: 'Take a photo or upload handwriting sample' },
-              { icon: '🧠', title: 'AI Analysis', desc: 'Advanced CNN model analyzes patterns instantly' },
-              { icon: '📊', title: 'Get Results', desc: 'Detailed report with recommendations' }
-            ].map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 }}
-                className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border-2 border-white/20 hover:bg-white/20 transition-all"
-              >
-                <div className="text-6xl mb-4">{step.icon}</div>
-                <h3 className="text-2xl font-bold text-white mb-3 dyslexia-text">{step.title}</h3>
-                <p className="text-purple-100 text-lg dyslexia-text">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link
-              to="/handwriting-analysis"
-              className="inline-flex items-center px-10 py-5 bg-white text-purple-600 font-black rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl dyslexia-text text-xl"
-            >
-              <Brain className="mr-3 h-7 w-7" />
-              Try AI Handwriting Analysis Now
-              <ArrowRight className="ml-3 h-7 w-7" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Stats Section */}
-      <section className="stats-section py-20 bg-white dark:bg-gray-900">
+      <section className="stats-section py-20 bg-white dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
+            {stats.map((stat, i) => {
               const Icon = stat.icon
               return (
                 <motion.div 
-                  key={index}
-                  className="text-center"
+                  key={i}
+                  className="stat-card text-center"
                   whileHover={{ scale: 1.05, y: -5 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
                 >
                   <div className="inline-flex p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl mb-4 border border-gray-200 dark:border-gray-700">
                     <Icon className={`h-8 w-8 ${stat.color}`} />
                   </div>
-                  <div className="stat-number text-4xl lg:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 dyslexia-text" data-value={stat.number.replace(/,/g, '')}>
-                    0{stat.suffix}
+                  <div className="text-4xl lg:text-5xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    {stat.number}
                   </div>
-                  <div className="text-[var(--text-secondary)] font-medium dyslexia-text">
+                  <div className="text-gray-600 dark:text-gray-400 font-medium">
                     {stat.label}
                   </div>
                 </motion.div>
@@ -416,67 +385,143 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features-section py-24 bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Main Feature Highlight */}
+      <section className="py-24 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bTAtMTBjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bTAgMTBjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full mb-6"
             >
-              <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                8 Powerful Features
-              </span>
+              <Star className="h-5 w-5 text-yellow-300" />
+              <span className="text-lg font-bold text-white">CORE FEATURE</span>
             </motion.div>
-            <h2 className="text-4xl lg:text-5xl font-bold dyslexia-text text-[var(--text-primary)] mb-4">
-              Everything You Need
+            
+            <h2 className="text-5xl lg:text-6xl font-black text-white mb-6">
+              AI Handwriting Analysis
             </h2>
-            <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto dyslexia-text">
-              A complete AI-powered ecosystem for accessible, engaging, and effective reading
+            <p className="text-2xl text-purple-100 max-w-4xl mx-auto leading-relaxed">
+              Advanced 4-layer CNN technology analyzes handwriting patterns to detect dyslexia indicators 
+              with <span className="font-black text-white">95-99% clinical accuracy</span>
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {mainFeature.stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center hover:bg-white/20 transition-all"
+              >
+                <div className="text-3xl font-black text-white mb-2">{stat}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link
+              to="/handwriting-analysis"
+              className="inline-flex items-center px-10 py-5 bg-white text-purple-600 font-black rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl text-xl"
+            >
+              <Brain className="mr-3 h-7 w-7" />
+              Start Analysis Now
+              <ArrowRight className="ml-3 h-7 w-7" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="steps-section py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Get professional-grade dyslexia screening in 4 simple steps
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step, i) => {
+              const Icon = step.icon
               return (
-                <motion.div 
-                  key={index}
-                  className="feature-card group relative"
+                <motion.div
+                  key={i}
+                  className="step-card relative"
                   whileHover={{ y: -8 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
                 >
-                  <div className={`relative bg-white dark:bg-gray-800 p-8 rounded-3xl border-2 transition-all duration-300 h-full overflow-hidden ${
-                    feature.featured 
-                      ? 'border-indigo-300 dark:border-indigo-700 shadow-2xl' 
-                      : 'border-gray-100 dark:border-gray-700 hover:border-transparent'
-                  }`}>
-                    {/* Gradient Border on Hover */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl -z-10`}></div>
+                  <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border-2 border-gray-200 dark:border-gray-700 hover:border-transparent transition-all relative overflow-hidden group">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl -z-10`}></div>
                     <div className="absolute inset-0.5 bg-white dark:bg-gray-800 rounded-3xl -z-10"></div>
                     
-                    {/* Tag */}
+                    <div className="absolute top-4 left-4 w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center font-black text-gray-600 dark:text-gray-300 text-xl">
+                      {i + 1}
+                    </div>
+
+                    <div className={`inline-flex p-4 bg-gradient-to-br ${step.color} rounded-2xl mb-6 mt-12 group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-8 w-8 text-white" />
+                    </div>
+
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-24 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+              6 More Powerful Features
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              A complete suite of AI-powered tools for accessible reading
+            </p>
+          </div>
+
+          <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, i) => {
+              const Icon = feature.icon
+              return (
+                <motion.div
+                  key={i}
+                  className="feature-card group"
+                  whileHover={{ y: -8 }}
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border-2 border-gray-200 dark:border-gray-700 hover:border-transparent transition-all h-full relative overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl -z-10`}></div>
+                    <div className="absolute inset-0.5 bg-white dark:bg-gray-800 rounded-3xl -z-10"></div>
+
                     <div className="absolute top-4 right-4">
-                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-                        feature.featured
-                          ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                      }`}>
+                      <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-full">
                         {feature.tag}
                       </span>
                     </div>
 
-                    {/* Icon */}
-                    <div className={`inline-flex p-4 bg-gradient-to-br ${feature.iconBg} rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`inline-flex p-4 bg-gradient-to-br ${feature.color} rounded-2xl mb-6 group-hover:scale-110 transition-transform`}>
                       <Icon className="h-7 w-7 text-white" />
                     </div>
 
-                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3 dyslexia-text">
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3">
                       {feature.title}
                     </h3>
-                    <p className="text-[var(--text-secondary)] dyslexia-text leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                       {feature.description}
                     </p>
                   </div>
@@ -487,125 +532,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* AI Features Highlight - Updated */}
-      <section className="py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-bold dyslexia-text mb-4">
-              Powered by AI & Machine Learning
-            </h2>
-            <p className="text-xl text-purple-100 dyslexia-text">
-              Advanced algorithms that adapt to your reading needs
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {aiFeatures.map((feature, i) => {
-              const Icon = feature.icon
-              return (
-                <motion.div
-                  key={i}
-                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all"
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <Icon className="h-10 w-10 text-white mb-4" />
-                  <h3 className="text-lg font-bold mb-2 dyslexia-text">{feature.title}</h3>
-                  <p className="text-purple-100 text-sm dyslexia-text">{feature.desc}</p>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full mb-6"
-              >
-                <Heart className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                  Accessibility First
-                </span>
-              </motion.div>
-
-              <h2 className="text-4xl lg:text-5xl font-bold dyslexia-text text-[var(--text-primary)] mb-6">
-                Built for Everyone
-              </h2>
-              <p className="text-xl text-[var(--text-secondary)] mb-8 dyslexia-text leading-relaxed">
-                VOXA isn't just accessible – it's designed from the ground up with dyslexia-friendly features, 
-                high contrast themes, and AI that adapts to your unique needs.
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {benefits.map((benefit, index) => {
-                  const Icon = benefit.icon
-                  return (
-                    <motion.div 
-                      key={index}
-                      className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ x: 5 }}
-                    >
-                      <Icon className={`h-5 w-5 ${benefit.color} flex-shrink-0`} />
-                      <span className="text-[var(--text-primary)] dyslexia-text text-sm">
-                        {benefit.text}
-                      </span>
-                    </motion.div>
-                  )
-                })}
-              </div>
-            </div>
-            
-            <motion.div 
-              className="relative"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-            >
-              <div className="relative bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 p-12 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800">
-                {/* Floating Icons */}
-                <div className="floating absolute top-10 left-10 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                  <Brain className="h-8 w-8 text-purple-600" />
-                </div>
-                <div className="floating absolute top-20 right-10 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                  <Zap className="h-8 w-8 text-orange-600" />
-                </div>
-                <div className="floating absolute bottom-10 left-1/4 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                  <FileText className="h-8 w-8 text-blue-600" />
-                </div>
-
-                {/* Center Icon */}
-                <div className="flex items-center justify-center">
-                  <div className="p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full">
-                    <Heart className="h-16 w-16 text-white" />
-                  </div>
-                </div>
-
-                <h3 className="text-3xl font-bold text-center mt-8 mb-4 text-[var(--text-primary)] dyslexia-text">
-                  Designed with Love
-                </h3>
-                <p className="text-center text-[var(--text-secondary)] dyslexia-text leading-relaxed">
-                  Every pixel, every feature, every interaction is crafted with input from users, 
-                  educators, and accessibility experts.
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="testimonials-section py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+      {/* Testimonials */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.div
@@ -615,55 +543,48 @@ const LandingPage = () => {
             >
               <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
               <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
-                Loved by Thousands
+                Trusted by Thousands
               </span>
             </motion.div>
-            <h2 className="text-4xl lg:text-5xl font-bold dyslexia-text text-[var(--text-primary)] mb-4">
-              What Our Users Say
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+              What Parents & Educators Say
             </h2>
-            <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto dyslexia-text">
-              Join 50,000+ satisfied users who transformed their reading experience
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Real stories from families who found answers with VOXA
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div 
-                key={index}
-                className="testimonial-card group"
-                whileHover={{ y: -10 }}
-              >
-                <div className="relative bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border-2 border-gray-100 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300 h-full">
-                  {/* Quote Icon */}
-                  <div className="absolute -top-4 -right-4 text-6xl text-purple-200 dark:text-purple-900 font-serif">"</div>
 
-                  {/* Stars */}
+          <div className="testimonials-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, i) => (
+              <motion.div
+                key={i}
+                className="testimonial group"
+                whileHover={{ y: -8 }}
+              >
+                <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 transition-all h-full">
                   <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    {[...Array(testimonial.rating)].map((_, j) => (
+                      <Star key={j} className="h-5 w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
 
-                  {/* Content */}
-                  <p className="text-[var(--text-primary)] mb-6 dyslexia-text leading-relaxed text-lg">
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed text-lg">
                     "{testimonial.content}"
                   </p>
 
-                  {/* Highlight Tag */}
                   <div className="mb-4">
-                    <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium rounded-full">
+                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-full">
                       ⭐ {testimonial.highlight}
                     </span>
                   </div>
 
-                  {/* Author */}
                   <div className="flex items-center space-x-4">
-                    <div className="text-4xl">{testimonial.image}</div>
+                    <div className="text-4xl">{testimonial.avatar}</div>
                     <div>
-                      <div className="font-bold text-[var(--text-primary)] dyslexia-text">
+                      <div className="font-black text-gray-900 dark:text-white">
                         {testimonial.name}
                       </div>
-                      <div className="text-[var(--text-secondary)] dyslexia-text text-sm">
+                      <div className="text-gray-600 dark:text-gray-400 text-sm">
                         {testimonial.role}
                       </div>
                     </div>
@@ -684,28 +605,20 @@ const LandingPage = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6">
-              <Sparkles className="h-4 w-4 text-white" />
-              <span className="text-sm font-medium text-white">
-                Start Your Journey Today
-              </span>
-            </div>
-
-            <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6 dyslexia-text">
-              Ready to Transform Your Reading?
+            <h2 className="text-4xl lg:text-6xl font-black text-white mb-6">
+              Ready to Get Started?
             </h2>
-            <p className="text-xl lg:text-2xl text-purple-100 mb-10 dyslexia-text leading-relaxed max-w-3xl mx-auto">
-              Join thousands using VOXA to read faster, comprehend better, and enjoy every word.
-              <span className="font-semibold"> Completely free, forever.</span>
+            <p className="text-xl lg:text-2xl text-purple-100 mb-10 leading-relaxed max-w-3xl mx-auto">
+              Join 50,000+ users using VOXA for dyslexia detection and accessible reading. 
+              <span className="font-bold"> 100% free, forever.</span>
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
               {user ? (
                 <Link
                   to="/dashboard"
-                  className="group inline-flex items-center px-10 py-5 bg-white text-purple-600 font-bold rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl dyslexia-text text-lg"
+                  className="group inline-flex items-center px-10 py-5 bg-white text-purple-600 font-black rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl text-lg"
                 >
                   <Sparkles className="mr-2 h-6 w-6 group-hover:rotate-180 transition-transform duration-500" />
                   Go to Dashboard
@@ -714,37 +627,36 @@ const LandingPage = () => {
               ) : (
                 <>
                   <Link
-                    to="/register"
-                    className="group inline-flex items-center px-10 py-5 bg-white text-purple-600 font-bold rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl dyslexia-text text-lg"
+                    to="/handwriting-analysis"
+                    className="group inline-flex items-center px-10 py-5 bg-white text-purple-600 font-black rounded-2xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-2xl text-lg"
                   >
-                    <Sparkles className="mr-2 h-6 w-6 group-hover:rotate-180 transition-transform duration-500" />
-                    Start Free Today
+                    <Brain className="mr-2 h-6 w-6 group-hover:scale-110 transition-transform" />
+                    Try AI Analysis Free
                     <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
-                    to="/handwriting-analysis"
-                    className="group inline-flex items-center px-10 py-5 border-2 border-white text-white font-bold rounded-2xl hover:bg-white/10 hover:scale-105 transition-all duration-300 dyslexia-text text-lg"
+                    to="/register"
+                    className="group inline-flex items-center px-10 py-5 border-2 border-white text-white font-black rounded-2xl hover:bg-white/10 hover:scale-105 transition-all duration-300 text-lg"
                   >
-                    <Brain className="mr-2 h-6 w-6 group-hover:scale-110 transition-transform" />
-                    Try AI Analysis
+                    <Users className="mr-2 h-6 w-6" />
+                    Create Free Account
                   </Link>
                 </>
               )}
             </div>
 
-            {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-white/80">
+            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-white/90">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5" />
-                <span className="dyslexia-text">No credit card required</span>
+                <Shield className="h-5 w-5" />
+                <span className="font-medium">GDPR Compliant</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-5 w-5" />
-                <span className="dyslexia-text">Free forever</span>
+                <span className="font-medium">No Credit Card</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-5 w-5" />
-                <span className="dyslexia-text">Cancel anytime</span>
+                <span className="font-medium">Free Forever</span>
               </div>
             </div>
           </motion.div>
