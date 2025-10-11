@@ -1,3 +1,4 @@
+// client/src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -43,25 +44,18 @@ const Navbar = () => {
     navigate('/login')
   }
 
+  // Features without AI Handwriting Analysis
   const features = [
     {
-      name: 'AI Handwriting Analysis',
-      description: '🎯 Detect dyslexia 95-99% accurate',
-      href: '/handwriting-analysis',
-      icon: Brain,
-      gradient: 'from-indigo-500 to-purple-500',
-      featured: true // NEW - Mark as MVP feature
-    },
-    {
       name: 'Text to Speech',
-      description: 'Convert text to natural speech',
+      description: 'Natural voice reading',
       href: '/text-to-speech',
       icon: Volume2,
       gradient: 'from-blue-500 to-cyan-500'
     },
     {
       name: 'Translation',
-      description: 'Translate to any language',
+      description: 'Translate to 50+ languages',
       href: '/translation',
       icon: Languages,
       gradient: 'from-green-500 to-emerald-500'
@@ -140,27 +134,28 @@ const Navbar = () => {
                 transition={{ duration: 0.6 }}
                 className="relative"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-shadow">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-shadow">
                   <BookOpen className="h-7 w-7 text-white" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse" />
               </motion.div>
               <div>
-                <span className="text-2xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent game-font">
+                <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                   VOXA
                 </span>
-                <div className="text-xs text-gray-500 dark:text-gray-400 fun-font -mt-1">
-                  Reading Assistant
+                <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                  AI Reading Platform
                 </div>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-2">
+              
               {/* Dashboard */}
               <Link
                 to="/dashboard"
-                className={`px-5 py-2.5 rounded-xl font-bold fun-font transition-all ${
+                className={`px-5 py-2.5 rounded-xl font-bold transition-all ${
                   isActive('/dashboard')
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -172,12 +167,30 @@ const Navbar = () => {
                 </div>
               </Link>
 
+              {/* AI Detect - Standalone (MVP Feature) */}
+              <Link
+                to="/handwriting-analysis"
+                className={`relative px-5 py-2.5 rounded-xl font-bold transition-all ${
+                  isActive('/handwriting-analysis')
+                    ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg'
+                    : 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-indigo-700 dark:text-indigo-300 hover:from-indigo-200 hover:to-purple-200 dark:hover:from-indigo-900/60 dark:hover:to-purple-900/60'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <Brain className="h-5 w-5" />
+                  <span>AI Detect</span>
+                  <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-black rounded-full animate-pulse">
+                    NEW
+                  </span>
+                </div>
+              </Link>
+
               {/* Features Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowFeaturesMenu(!showFeaturesMenu)}
                   onMouseEnter={() => setShowFeaturesMenu(true)}
-                  className={`px-5 py-2.5 rounded-xl font-bold fun-font transition-all flex items-center space-x-2 ${
+                  className={`px-5 py-2.5 rounded-xl font-bold transition-all flex items-center space-x-2 ${
                     showFeaturesMenu
                       ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -188,32 +201,32 @@ const Navbar = () => {
                   <ChevronDown className={`h-4 w-4 transition-transform ${showFeaturesMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Features Mega Menu */}
+                {/* Features Mega Menu - IMPROVED SPACING */}
                 <AnimatePresence>
                   {showFeaturesMenu && (
                     <>
                       <div 
-                        className="absolute left-1/2 transform -translate-x-1/2 w-full h-4 top-full z-[90]"
+                        className="absolute left-1/2 transform -translate-x-1/2 w-full h-6 top-full z-[90]"
                         onMouseEnter={() => setShowFeaturesMenu(true)}
                       />
                       
                       <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
                         onMouseEnter={() => setShowFeaturesMenu(true)}
                         onMouseLeave={() => setShowFeaturesMenu(false)}
-                        className="fixed left-1/2 transform -translate-x-1/2 w-[90vw] max-w-5xl z-[100]"
-                        style={{ top: '5.5rem' }}
+                        className="fixed left-1/2 transform -translate-x-1/2 w-[85vw] max-w-4xl z-[100]"
+                        style={{ top: '6rem' }}
                       >
-                        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border-2 border-purple-100 dark:border-purple-900/30 p-8">
+                        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 p-6">
                           <div className="mb-6">
-                            <h3 className="text-2xl font-black text-gray-800 dark:text-white game-font mb-2">
-                              ✨ All Features
+                            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+                              ✨ More Features
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 fun-font">
-                              Choose from our powerful reading tools
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              Powerful tools for accessible reading
                             </p>
                           </div>
                           
@@ -225,24 +238,15 @@ const Navbar = () => {
                                   key={feature.href}
                                   to={feature.href}
                                   onClick={() => setShowFeaturesMenu(false)}
-                                  className={`group p-5 rounded-2xl transition-all border-2 ${
-                                    feature.featured
-                                      ? 'bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-300 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-600'
-                                      : 'hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 border-transparent hover:border-purple-200 dark:hover:border-purple-800'
-                                  }`}
+                                  className="group p-4 rounded-2xl transition-all border-2 border-transparent hover:border-purple-200 dark:hover:border-purple-700 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20"
                                 >
-                                  {feature.featured && (
-                                    <div className="mb-2 inline-block px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-black rounded-full">
-                                      🎯 MVP FEATURE
-                                    </div>
-                                  )}
                                   <div className={`inline-flex p-3 bg-gradient-to-r ${feature.gradient} rounded-xl mb-3 group-hover:scale-110 transition-transform`}>
-                                    <Icon className="h-6 w-6 text-white" />
+                                    <Icon className="h-5 w-5 text-white" />
                                   </div>
-                                  <h4 className="font-bold text-gray-800 dark:text-white fun-font text-lg mb-1">
+                                  <h4 className="font-bold text-gray-900 dark:text-white text-base mb-1">
                                     {feature.name}
                                   </h4>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 fun-font">
+                                  <p className="text-xs text-gray-600 dark:text-gray-400">
                                     {feature.description}
                                   </p>
                                 </Link>
@@ -259,7 +263,7 @@ const Navbar = () => {
               {/* Community */}
               <Link
                 to="/community"
-                className={`px-5 py-2.5 rounded-xl font-bold fun-font transition-all ${
+                className={`px-5 py-2.5 rounded-xl font-bold transition-all ${
                   isActive('/community')
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -274,7 +278,7 @@ const Navbar = () => {
               {/* Leaderboard */}
               <Link
                 to="/leaderboard"
-                className={`px-5 py-2.5 rounded-xl font-bold fun-font transition-all ${
+                className={`px-5 py-2.5 rounded-xl font-bold transition-all ${
                   isActive('/leaderboard')
                     ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -314,10 +318,10 @@ const Navbar = () => {
                       <span className="text-2xl">{userProfile.avatar}</span>
                     )}
                     <div className="text-left">
-                      <div className="text-sm font-bold text-white game-font leading-tight">
+                      <div className="text-sm font-bold text-white leading-tight">
                         {userProfile?.name || user.email.split('@')[0]}
                       </div>
-                      <div className="text-xs text-white/80 fun-font flex items-center space-x-1">
+                      <div className="text-xs text-white/80 flex items-center space-x-1">
                         <Trophy className="h-3 w-3" />
                         <span>{userProfile?.reputation || 0}</span>
                       </div>
@@ -343,10 +347,10 @@ const Navbar = () => {
                             <div className="flex items-center space-x-4">
                               <span className="text-5xl">{userProfile?.avatar}</span>
                               <div className="flex-1">
-                                <div className="text-xl font-black text-white game-font">
+                                <div className="text-xl font-black text-white">
                                   {userProfile?.name}
                                 </div>
-                                <div className="text-sm text-white/80 fun-font">
+                                <div className="text-sm text-white/80">
                                   {user.email}
                                 </div>
                                 <div className="mt-2 flex items-center space-x-4">
@@ -368,7 +372,7 @@ const Navbar = () => {
                             <Link
                               to="/profile"
                               onClick={() => setShowUserMenu(false)}
-                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl transition-all font-bold fun-font"
+                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl transition-all font-bold"
                             >
                               <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                               <div className="flex-1">
@@ -382,7 +386,7 @@ const Navbar = () => {
                             <Link
                               to="/goals"
                               onClick={() => setShowUserMenu(false)}
-                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-2xl transition-all font-bold fun-font"
+                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-2xl transition-all font-bold"
                             >
                               <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
                               <div className="flex-1">
@@ -396,7 +400,7 @@ const Navbar = () => {
                             <Link
                               to="/settings"
                               onClick={() => setShowUserMenu(false)}
-                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all font-bold fun-font"
+                              className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all font-bold"
                             >
                               <Settings className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                               <div className="flex-1">
@@ -414,7 +418,7 @@ const Navbar = () => {
                                 handleLogout()
                                 setShowUserMenu(false)
                               }}
-                              className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all font-bold fun-font"
+                              className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all font-bold"
                             >
                               <LogOut className="h-5 w-5" />
                               <div className="flex-1 text-left">
@@ -462,7 +466,7 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3">
                       <span className="text-4xl">{userProfile.avatar}</span>
                       <div className="flex-1">
-                        <div className="text-lg font-bold text-white game-font">
+                        <div className="text-lg font-bold text-white">
                           {userProfile.name}
                         </div>
                         <div className="flex items-center space-x-2 text-white/80 text-sm">
@@ -477,16 +481,33 @@ const Navbar = () => {
                 <Link
                   to="/dashboard"
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold fun-font"
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold"
                 >
                   <Home className="h-5 w-5" />
                   <span>Dashboard</span>
                 </Link>
 
+                {/* AI Detect - Mobile */}
+                <Link
+                  to="/handwriting-analysis"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 hover:from-indigo-200 hover:to-purple-200 dark:hover:from-indigo-900/60 dark:hover:to-purple-900/60 rounded-xl transition-all font-bold text-indigo-700 dark:text-indigo-300"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg">
+                      <Brain className="h-5 w-5 text-white" />
+                    </div>
+                    <span>AI Detect</span>
+                  </div>
+                  <span className="px-2 py-1 bg-yellow-400 text-gray-900 text-xs font-black rounded-full">
+                    NEW
+                  </span>
+                </Link>
+
                 <Link
                   to="/community"
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold fun-font"
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold"
                 >
                   <Users className="h-5 w-5" />
                   <span>Community</span>
@@ -495,16 +516,16 @@ const Navbar = () => {
                 <Link
                   to="/leaderboard"
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-xl transition-all font-bold fun-font"
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-xl transition-all font-bold"
                 >
                   <Trophy className="h-5 w-5 text-yellow-600" />
                   <span>Leaderboard</span>
                 </Link>
 
-                <div className="my-2 h-px bg-gray-200 dark:bg-gray-700" />
+                <div className="my-2 h-px bg-gray-200 dark:border-gray-700" />
 
                 <div className="text-xs font-bold text-gray-500 dark:text-gray-400 px-4 py-2 uppercase tracking-wider">
-                  Features
+                  More Features
                 </div>
 
                 {features.map((feature) => {
@@ -514,20 +535,13 @@ const Navbar = () => {
                       key={feature.href}
                       to={feature.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold fun-font"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold"
                     >
                       <div className={`p-2 bg-gradient-to-r ${feature.gradient} rounded-lg`}>
                         <Icon className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span>{feature.name}</span>
-                          {feature.featured && (
-                            <span className="text-xs bg-yellow-400 text-gray-900 px-2 py-0.5 rounded-full font-black">
-                              MVP
-                            </span>
-                          )}
-                        </div>
+                        <div>{feature.name}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           {feature.description}
                         </div>
@@ -543,7 +557,7 @@ const Navbar = () => {
                     <Link
                       to="/profile"
                       onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold fun-font"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold"
                     >
                       <User className="h-5 w-5" />
                       <span>My Profile</span>
@@ -552,7 +566,7 @@ const Navbar = () => {
                     <Link
                       to="/settings"
                       onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold fun-font"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all font-bold"
                     >
                       <Settings className="h-5 w-5" />
                       <span>Settings</span>
@@ -563,7 +577,7 @@ const Navbar = () => {
                         handleLogout()
                         setShowMobileMenu(false)
                       }}
-                      className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-bold fun-font"
+                      className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-bold"
                     >
                       <LogOut className="h-5 w-5" />
                       <span>Logout</span>
