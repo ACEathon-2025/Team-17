@@ -10,9 +10,13 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
+    "@tensorflow-models/mobilenet": "^2.1.1",
+    "@tensorflow/tfjs": "^4.22.0",
     "axios": "^1.12.2",
     "framer-motion": "^10.16.0",
     "gsap": "^3.12.2",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "jszip": "^3.10.1",
     "lucide-react": "^0.292.0",
     "mammoth": "^1.11.0",

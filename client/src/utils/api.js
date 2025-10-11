@@ -1,5 +1,6 @@
 // client/src/utils/api.js
 import axios from 'axios'
+import { supabase } from './supabase'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
@@ -43,13 +44,41 @@ const processQueue = async () => {
   isProcessingQueue = false
 }
 
-// Request interceptor to add auth token and queue requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+// ✅ NEW: Get fresh Supabase token
+export const getAuthHeaders = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    const headers = {
+      'Content-Type': 'application/json'
     }
+    
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`
+    }
+    
+    return headers
+  } catch (error) {
+    console.error('Failed to get auth headers:', error)
+    return {
+      'Content-Type': 'application/json'
+    }
+  }
+}
+
+// Request interceptor to add auth token from Supabase
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (session?.access_token) {
+        config.headers.Authorization = `Bearer ${session.access_token}`
+      }
+    } catch (error) {
+      console.error('Failed to attach auth token:', error)
+    }
+    
     return config
   },
   (error) => {
@@ -65,8 +94,26 @@ api.interceptors.response.use(
 
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      originalRequest._retry = true
+      
+      try {
+        // Try to refresh session
+        const { data: { session } } = await supabase.auth.refreshSession()
+        
+        if (session?.access_token) {
+          originalRequest.headers.Authorization = `Bearer ${session.access_token}`
+          return api(originalRequest)
+        } else {
+          // Session refresh failed - sign out
+          await supabase.auth.signOut()
+          window.location.href = '/login'
+        }
+      } catch (refreshError) {
+        console.error('Session refresh failed:', refreshError)
+        await supabase.auth.signOut()
+        window.location.href = '/login'
+      }
+      
       return Promise.reject(error)
     }
 
@@ -135,3 +182,30 @@ export const clearApiCache = (key) => {
     cache.clear()
   }
 }
+
+// ✅ NEW: Simplified API request helper
+export const apiRequest = async (endpoint, options = {}) => {
+  try {
+    const authHeaders = await getAuthHeaders()
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        ...authHeaders,
+        ...options.headers
+      }
+    })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Request failed')
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('API request error:', error)
+    throw error
+  }
+}
+
+export default api

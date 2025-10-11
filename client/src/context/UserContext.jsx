@@ -105,85 +105,101 @@ export const UserProvider = ({ children }) => {
   }
 
   const fetchUserData = async () => {
-    if (!user) return
+  if (!user) return
 
-    setLoading(true)
-    try {
-      // Use cached API calls to reduce load
-      const promises = []
+  setLoading(true)
+  try {
+    const promises = []
 
-      if (shouldFetch('settings')) {
-        promises.push(
-          cachedApiCall(`settings-${user.id}`, () => api.get(`/users/settings/${user.id}`))
-            .then(data => {
-              if (data && Object.keys(data).length > 0) {
-                setSettings(prev => ({ ...prev, ...data }))
-                // Save to localStorage
-                localStorage.setItem(`voxa-settings-${user.id}`, JSON.stringify(data))
-                applySettingsToDocument(data)
-              }
-              updateLastFetch('settings')
-              return data
-            })
-            .catch(() => ({ data: {} }))
-        )
-      }
-
-      if (shouldFetch('stats')) {
-        promises.push(
-          cachedApiCall(`stats-${user.id}`, () => api.get(`/reading/stats/${user.id}`))
-            .then(data => {
-              if (data) setStats(prev => ({ ...prev, ...data }))
-              updateLastFetch('stats')
-              return data
-            })
-            .catch(() => ({ data: {} }))
-        )
-      }
-
-      if (shouldFetch('progress')) {
-        promises.push(
-          cachedApiCall(`progress-${user.id}`, () => api.get(`/reading/activity/${user.id}?limit=10`))
-            .then(data => {
-              setReadingProgress(Array.isArray(data) ? data : [])
-              updateLastFetch('progress')
-              return data
-            })
-            .catch(() => ({ data: [] }))
-        )
-      }
-
-      if (shouldFetch('achievements')) {
-        promises.push(
-          cachedApiCall(`achievements-${user.id}`, () => api.get(`/users/achievements/${user.id}`))
-            .then(data => {
-              setAchievements(Array.isArray(data) ? data : [])
-              updateLastFetch('achievements')
-              return data
-            })
-            .catch(() => ({ data: [] }))
-        )
-      }
-
-      if (shouldFetch('profile')) {
-        promises.push(
-          cachedApiCall(`profile-${user.id}`, () => api.get(`/users/profile/${user.id}`))
-            .then(data => {
-              setUserProfile(data)
-              updateLastFetch('profile')
-              return data
-            })
-            .catch(() => ({ data: null }))
-        )
-      }
-
-      await Promise.allSettled(promises)
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    } finally {
-      setLoading(false)
+    // Settings
+    if (shouldFetch('settings')) {
+      promises.push(
+        api.get(`/users/settings/${user.id}`)
+          .then(response => {
+            const data = response?.data || {}
+            if (data && Object.keys(data).length > 0) {
+              setSettings(prev => ({ ...prev, ...data }))
+              localStorage.setItem(`voxa-settings-${user.id}`, JSON.stringify(data))
+              applySettingsToDocument(data)
+            }
+            updateLastFetch('settings')
+          })
+          .catch(error => {
+            console.warn('Settings endpoint not available:', error.message)
+            // Use default/local settings
+          })
+      )
     }
+
+    // Stats
+    if (shouldFetch('stats')) {
+      promises.push(
+        api.get(`/reading/stats/${user.id}`)
+          .then(response => {
+            const data = response?.data || {}
+            if (data) setStats(prev => ({ ...prev, ...data }))
+            updateLastFetch('stats')
+          })
+          .catch(error => {
+            console.warn('Stats endpoint error:', error.message)
+            // Keep default stats
+          })
+      )
+    }
+
+    // Progress
+    if (shouldFetch('progress')) {
+      promises.push(
+        api.get(`/reading/activity/${user.id}?limit=10`)
+          .then(response => {
+            const data = response?.data || []
+            setReadingProgress(Array.isArray(data) ? data : [])
+            updateLastFetch('progress')
+          })
+          .catch(error => {
+            console.warn('Progress endpoint error:', error.message)
+          })
+      )
+    }
+
+    // Achievements
+    if (shouldFetch('achievements')) {
+      promises.push(
+        api.get(`/users/achievements/${user.id}`)
+          .then(response => {
+            const data = response?.data || []
+            setAchievements(Array.isArray(data) ? data : [])
+            updateLastFetch('achievements')
+          })
+          .catch(error => {
+            console.warn('Achievements endpoint error:', error.message)
+          })
+      )
+    }
+
+    // Profile
+    if (shouldFetch('profile')) {
+      promises.push(
+        api.get(`/users/profile/${user.id}`)
+          .then(response => {
+            const data = response?.data || null
+            setUserProfile(data)
+            updateLastFetch('profile')
+          })
+          .catch(error => {
+            console.warn('Profile endpoint error:', error.message)
+          })
+      )
+    }
+
+    await Promise.allSettled(promises)
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const updateUserProfile = async (profileData) => {
     try {

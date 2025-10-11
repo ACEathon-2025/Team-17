@@ -19,6 +19,7 @@ import Summarize from './pages/Summarize.jsx'
 import Quiz from './pages/Quiz.jsx'
 import SpeedReading from './pages/SpeedReading.jsx'
 import VoiceCommands from './pages/VoiceCommands.jsx'
+import HandwritingAnalysis from './pages/HandwritingAnalysis.jsx' // NEW - AI MVP Feature
 import { BionicProvider } from './context/BionicContext'
 import Collections from './pages/Collections'
 import { EyeComfortProvider } from './context/EyeComfortContext'
@@ -27,6 +28,11 @@ import Goals from './pages/Goals'
 import ImportText from './pages/ImportText'
 import { useVoiceCommands } from './hooks/useVoiceCommands'
 import FloatingVoiceButton from './components/voice/FloatingVoiceButton'
+import Games from './pages/Games'
+import Community from './pages/Community'
+import PostDetail from './pages/PostDetail'
+import UserProfile from './pages/UserProfile'
+import Leaderboard from './pages/Leaderboard'
 
 // Global Voice Commands Component
 function GlobalVoiceCommands() {
@@ -34,7 +40,7 @@ function GlobalVoiceCommands() {
     transcript, 
     listening, 
     stopListening 
-  } = useVoiceCommands(true) // Always enabled globally
+  } = useVoiceCommands(true)
 
   return (
     <FloatingVoiceButton
@@ -54,6 +60,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/handwriting-analysis" element={<HandwritingAnalysis />} /> {/* NEW - AI MVP Feature */}
           <Route path="/text-to-speech" element={<TextToSpeech />} />
           <Route path="/translation" element={<Translation />} />
           <Route path="/focus-mode" element={<FocusMode />} />
@@ -67,6 +74,11 @@ function AppContent() {
           <Route path="/collections" element={<Collections />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/import" element={<ImportText />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/community/post/:channelId/:postId" element={<PostDetail />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
         </Routes>
         <EyeBreakOverlay />
       </main>

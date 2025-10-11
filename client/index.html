@@ -7,8 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VOXA - Making Reading Accessible</title>
     <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.14.0/runtime.min.js"></script>
+    
+    <!-- Existing Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.ttf" rel="preload" as="font" type="font/ttf" crossorigin>
+    
+    <!-- Gaming Fonts - NEW! -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&family=Righteous&display=swap" rel="stylesheet">
+    
     <style>
       @font-face {
         font-family: 'OpenDyslexic';
@@ -22,6 +28,27 @@
         src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.ttf') format('truetype');
         font-weight: bold;
         font-style: normal;
+      }
+
+      /* Gaming Font Classes */
+      .game-font {
+        font-family: 'Fredoka', 'OpenDyslexic', sans-serif;
+        letter-spacing: 0.05em;
+      }
+
+      .pixel-font {
+        font-family: 'Press Start 2P', monospace;
+        letter-spacing: 0.1em;
+      }
+
+      .fun-font {
+        font-family: 'Baloo 2', 'OpenDyslexic', cursive;
+        letter-spacing: 0.03em;
+      }
+
+      .bold-font {
+        font-family: 'Righteous', 'OpenDyslexic', sans-serif;
+        letter-spacing: 0.05em;
       }
     </style>
   </head>

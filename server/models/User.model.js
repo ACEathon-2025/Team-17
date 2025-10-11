@@ -1,4 +1,3 @@
-// server/models/User.model.js
 import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema({
@@ -12,12 +11,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   profile: {
-    firstName: String,
+    firstName: {
+      type: String,
+      default: 'User'
+    },
     lastName: String,
-    avatar: String,
+    avatar: {
+      type: String,
+      default: '👤'
+    },
     bio: String
   },
   settings: {
@@ -35,6 +41,14 @@ const userSchema = new mongoose.Schema({
       type: String,
       default: 'normal',
       enum: ['tight', 'normal', 'wide', 'wider']
+    },
+    fontFamily: {
+      type: String,
+      default: 'lexend'
+    },
+    wordSpacing: {
+      type: String,
+      default: 'normal'
     },
     readingSpeed: {
       type: Number,
@@ -58,9 +72,33 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     },
+    dyslexiaFriendly: {
+      type: Boolean,
+      default: true
+    },
     language: {
       type: String,
       default: 'en'
+    },
+    focusModeSpeed: {
+      type: Number,
+      default: 200
+    },
+    focusWordByWord: {
+      type: Boolean,
+      default: false
+    },
+    focusPauseTime: {
+      type: Number,
+      default: 500
+    },
+    preferredTranslationLanguage: {
+      type: String,
+      default: 'es'
+    },
+    autoTranslate: {
+      type: Boolean,
+      default: true
     }
   },
   stats: {
@@ -76,8 +114,25 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
-    lastReadingDate: Date
+    lastReadingDate: Date,
+    averageSessionTime: {
+      type: Number,
+      default: 0
+    }
   },
+  readingSessions: [{
+    textId: String,
+    title: String,
+    content: String,
+    progress: Number,
+    completed: Boolean,
+    duration: Number,
+    sessionType: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   achievements: [{
     id: String,
     title: String,
@@ -96,8 +151,15 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true // Automatically manage createdAt and updatedAt
 })
 
+// Index for faster queries
+userSchema.index({ supabaseId: 1 })
+userSchema.index({ email: 1 })
+
+// Pre-save middleware to update timestamp
 userSchema.pre('save', function(next) {
   this.updatedAt = Date.now()
   next()
