@@ -1,152 +1,358 @@
-import { jsPDF } from 'jspdf'
-import autoTable from 'jspdf-autotable'
+// client/src/utils/pdfGenerator.js
+import jsPDF from 'jspdf'
 
-export const generateAnalysisReport = (analysis, userName = 'Student') => {
-  const doc = new jsPDF()
+export const generateAnalysisReport = (analysis, userData) => {
+  try {
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 20
+    let yPos = margin
 
-  // Header with gradient effect
-  doc.setFillColor(124, 58, 237)
-  doc.rect(0, 0, 210, 45, 'F')
-  
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(32)
-  doc.setFont('helvetica', 'bold')
-  doc.text('VOXA AI', 105, 20, { align: 'center' })
-  
-  doc.setFontSize(16)
-  doc.text('Dyslexia Handwriting Analysis Report', 105, 32, { align: 'center' })
+    // Extract user data
+    const userName = typeof userData === 'string' ? userData : userData.name || 'Anonymous'
+    const userAge = typeof userData === 'object' ? userData.age : null
 
-  // Report Info Box
-  doc.setFillColor(243, 244, 246)
-  doc.roundedRect(15, 55, 180, 35, 3, 3, 'F')
-  
-  doc.setTextColor(0, 0, 0)
-  doc.setFontSize(12)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Student Name:', 20, 65)
-  doc.setFont('helvetica', 'normal')
-  doc.text(userName, 60, 65)
-  
-  doc.setFont('helvetica', 'bold')
-  doc.text('Age:', 20, 73)
-  doc.setFont('helvetica', 'normal')
-  doc.text(analysis.age ? `${analysis.age} years` : 'Not specified', 60, 73)
-  
-  doc.setFont('helvetica', 'bold')
-  doc.text('Date:', 20, 81)
-  doc.setFont('helvetica', 'normal')
-  doc.text(new Date(analysis.createdAt).toLocaleDateString(), 60, 81)
-
-  // Risk Assessment Section
-  doc.setFontSize(18)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Risk Assessment', 20, 105)
-
-  const riskColor = analysis.riskLevel === 'High' ? [220, 38, 38] :
-                    analysis.riskLevel === 'Medium' ? [234, 179, 8] : [34, 197, 94]
-  
-  doc.setFillColor(...riskColor)
-  doc.roundedRect(20, 110, 170, 25, 3, 3, 'F')
-  
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(20)
-  doc.text(
-    `${analysis.riskLevel} Risk - ${Math.round(analysis.confidence * 100)}% Confidence`,
-    105, 
-    125, 
-    { align: 'center' }
-  )
-
-  // Detailed Metrics Table
-  doc.setTextColor(0, 0, 0)
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Detailed Metrics', 20, 150)
-
-  const metricsData = [
-    ['Letter Reversals', `${analysis.detailedMetrics.letterReversals}%`],
-    ['Spacing Issues', `${analysis.detailedMetrics.spacingIssues}%`],
-    ['Formation Issues', `${analysis.detailedMetrics.formationIssues}%`],
-    ['Pressure Variation', `${analysis.detailedMetrics.pressureVariation}%`],
-    ['Baseline Alignment', `${analysis.detailedMetrics.baselineAlignment}%`]
-  ]
-
-  // ✅ FIXED: Use autoTable correctly
-  autoTable(doc, {
-    startY: 155,
-    head: [['Metric', 'Score']],
-    body: metricsData,
-    theme: 'grid',
-    headStyles: { fillColor: [124, 58, 237], fontSize: 12, fontStyle: 'bold' },
-    styles: { fontSize: 11 }
-  })
-
-  // Indicators Section
-  let yPos = doc.lastAutoTable.finalY + 15
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Detected Indicators', 20, yPos)
-
-  yPos += 8
-  doc.setFontSize(11)
-  doc.setFont('helvetica', 'normal')
-  analysis.indicators.forEach((indicator, index) => {
-    const lines = doc.splitTextToSize(`${index + 1}. ${indicator}`, 170)
-    doc.text(lines, 25, yPos)
-    yPos += lines.length * 6
-    if (yPos > 270) {
-      doc.addPage()
-      yPos = 20
+    // Helper function to add text with auto-wrap
+    const addText = (text, x, y, maxWidth, options = {}) => {
+      const fontSize = options.fontSize || 11
+      const fontStyle = options.fontStyle || 'normal'
+      const color = options.color || [0, 0, 0]
+      
+      doc.setFontSize(fontSize)
+      doc.setFont('helvetica', fontStyle)
+      doc.setTextColor(...color)
+      
+      const lines = doc.splitTextToSize(text, maxWidth)
+      doc.text(lines, x, y)
+      
+      return y + (lines.length * fontSize * 0.4) + 2
     }
-  })
 
-  // Recommendations Section
-  if (yPos > 220) {
-    doc.addPage()
-    yPos = 20
-  } else {
-    yPos += 10
-  }
-  
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Recommendations', 20, yPos)
+    // Header Background
+    doc.setFillColor(99, 102, 241)
+    doc.rect(0, 0, pageWidth, 50, 'F')
 
-  yPos += 8
-  doc.setFontSize(11)
-  doc.setFont('helvetica', 'normal')
-  analysis.recommendations.forEach((rec, index) => {
-    const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, 170)
-    doc.text(lines, 25, yPos)
-    yPos += lines.length * 6
-    if (yPos > 270) {
-      doc.addPage()
-      yPos = 20
+    // Logo/Icon
+    doc.setFillColor(255, 255, 255)
+    doc.circle(25, 25, 8, 'F')
+    doc.setFillColor(99, 102, 241)
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(99, 102, 241)
+    doc.text('AI', 21, 28)
+
+    // Title
+    doc.setFontSize(24)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(255, 255, 255)
+    doc.text('VOXA AI Handwriting Analysis', 45, 25)
+
+    // Subtitle
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(240, 240, 255)
+    doc.text('Clinical-Grade Dyslexia Detection Report', 45, 35)
+
+    yPos = 60
+
+    // Patient Information Box
+    doc.setFillColor(249, 250, 251)
+    doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 35, 3, 3, 'F')
+    
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(55, 65, 81)
+    doc.text('Patient Information', margin + 5, yPos + 10)
+
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(75, 85, 99)
+    
+    // Name
+    doc.text(`Name: ${userName}`, margin + 5, yPos + 20)
+    
+    // Age - FIXED: Check multiple sources for age
+    let displayAge = 'Not specified'
+    if (userAge) {
+      displayAge = `${userAge} years`
+    } else if (analysis.age) {
+      displayAge = `${analysis.age} years`
     }
-  })
+    doc.text(`Age: ${displayAge}`, margin + 5, yPos + 27)
+    
+    // Date
+    doc.text(
+      `Report Date: ${new Date(analysis.createdAt || Date.now()).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })}`,
+      pageWidth - margin - 70,
+      yPos + 20
+    )
 
-  // Footer
-  const pageCount = doc.internal.getNumberOfPages()
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i)
+    // Analysis ID
     doc.setFontSize(9)
-    doc.setTextColor(128, 128, 128)
-    doc.text(
-      'Generated by VOXA AI - For Educational Purposes Only',
-      105,
-      285,
-      { align: 'center' }
-    )
-    doc.text(
-      'This is not a medical diagnosis. Consult a professional for formal assessment.',
-      105,
-      290,
-      { align: 'center' }
-    )
-    doc.text(`Page ${i} of ${pageCount}`, 195, 290, { align: 'right' })
-  }
+    doc.setTextColor(156, 163, 175)
+    const reportId = analysis._id ? String(analysis._id).substring(0, 12) : 'N/A'
+    doc.text(`Report ID: ${reportId}`, pageWidth - margin - 70, yPos + 27)
 
-  // Save PDF
-  const fileName = `VOXA-Analysis-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`
-  doc.save(fileName)
+    yPos += 45
+
+    // Risk Level Section
+    const riskColors = {
+      'Low': [34, 197, 94],
+      'Medium': [234, 179, 8],
+      'High': [239, 68, 68]
+    }
+
+    const riskColor = riskColors[analysis.riskLevel] || [156, 163, 175]
+
+    doc.setFillColor(...riskColor)
+    doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 30, 3, 3, 'F')
+
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(255, 255, 255)
+    doc.text(
+      `Risk Level: ${analysis.riskLevel || 'Unknown'}`,
+      margin + 10,
+      yPos + 15
+    )
+
+    doc.setFontSize(14)
+    const confidence = analysis.confidence ? Math.round(analysis.confidence * 100) : 0
+    doc.text(
+      `Confidence: ${confidence}%`,
+      pageWidth - margin - 60,
+      yPos + 15
+    )
+
+    yPos += 40
+
+    // Divider
+    doc.setDrawColor(229, 231, 235)
+    doc.setLineWidth(0.5)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 10
+
+    // Detailed Metrics Section
+    if (analysis.detailedMetrics && Object.keys(analysis.detailedMetrics).length > 0) {
+      doc.setFontSize(16)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(55, 65, 81)
+      doc.text('Detailed Metrics', margin, yPos)
+      yPos += 10
+
+      const metrics = [
+        { name: 'Letter Reversals', value: analysis.detailedMetrics.letterReversals || 0 },
+        { name: 'Spacing Issues', value: analysis.detailedMetrics.spacingIssues || 0 },
+        { name: 'Formation Issues', value: analysis.detailedMetrics.formationIssues || 0 },
+        { name: 'Pressure Variation', value: analysis.detailedMetrics.pressureVariation || 0 },
+        { name: 'Baseline Alignment', value: analysis.detailedMetrics.baselineAlignment || 0 },
+        { name: 'Letter Sizing', value: analysis.detailedMetrics.letterSizing || analysis.detailedMetrics.formationIssues || 0 },
+        { name: 'Stroke Control', value: analysis.detailedMetrics.strokeControl || analysis.detailedMetrics.pressureVariation || 0 },
+        { name: 'Overall Risk Score', value: analysis.detailedMetrics.overallRisk || 0 }
+      ]
+
+      metrics.forEach((metric, index) => {
+        if (index % 2 === 0 && index > 0) {
+          yPos += 8
+        }
+
+        if (yPos > pageHeight - 40) {
+          doc.addPage()
+          yPos = margin
+        }
+
+        const xPos = (index % 2 === 0) ? margin : pageWidth / 2 + 5
+        const barWidth = (pageWidth / 2) - margin - 10
+        const barHeight = 6
+
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(75, 85, 99)
+        doc.text(metric.name, xPos, yPos)
+
+        doc.setFont('helvetica', 'bold')
+        doc.text(`${metric.value}%`, xPos + barWidth - 15, yPos)
+
+        doc.setFillColor(229, 231, 235)
+        doc.roundedRect(xPos, yPos + 2, barWidth, barHeight, 2, 2, 'F')
+
+        const fillWidth = Math.max(0, Math.min(100, metric.value)) / 100 * barWidth
+        if (fillWidth > 0) {
+          const barColor = metric.value > 70 ? [239, 68, 68] : 
+                          metric.value > 40 ? [234, 179, 8] : 
+                          [34, 197, 94]
+          doc.setFillColor(...barColor)
+          doc.roundedRect(xPos, yPos + 2, fillWidth, barHeight, 2, 2, 'F')
+        }
+      })
+
+      yPos += 20
+    }
+
+    if (yPos > pageHeight - 80) {
+      doc.addPage()
+      yPos = margin
+    }
+
+    doc.setDrawColor(229, 231, 235)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 10
+
+    // Detected Indicators
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(55, 65, 81)
+    doc.text('Detected Indicators', margin, yPos)
+    yPos += 8
+
+    if (analysis.indicators && Array.isArray(analysis.indicators) && analysis.indicators.length > 0) {
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(75, 85, 99)
+
+      analysis.indicators.forEach((indicator) => {
+        if (yPos > pageHeight - 30) {
+          doc.addPage()
+          yPos = margin
+        }
+
+        doc.setFillColor(99, 102, 241)
+        doc.circle(margin + 2, yPos - 1, 1.5, 'F')
+
+        const maxWidth = pageWidth - margin * 2 - 10
+        yPos = addText(String(indicator), margin + 8, yPos, maxWidth, { fontSize: 10 })
+        yPos += 3
+      })
+    } else {
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'italic')
+      doc.setTextColor(156, 163, 175)
+      doc.text('No specific indicators detected.', margin, yPos)
+      yPos += 8
+    }
+
+    yPos += 5
+
+    if (yPos > pageHeight - 80) {
+      doc.addPage()
+      yPos = margin
+    }
+
+    doc.setDrawColor(229, 231, 235)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 10
+
+    // Recommendations
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(55, 65, 81)
+    doc.text('Recommendations', margin, yPos)
+    yPos += 8
+
+    if (analysis.recommendations && Array.isArray(analysis.recommendations) && analysis.recommendations.length > 0) {
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(75, 85, 99)
+
+      analysis.recommendations.forEach((recommendation, index) => {
+        if (yPos > pageHeight - 30) {
+          doc.addPage()
+          yPos = margin
+        }
+
+        doc.setFillColor(99, 102, 241)
+        doc.circle(margin + 3, yPos - 1, 2.5, 'F')
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(255, 255, 255)
+        doc.text(`${index + 1}`, margin + 1.5, yPos + 1)
+
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(75, 85, 99)
+        const maxWidth = pageWidth - margin * 2 - 12
+        yPos = addText(String(recommendation), margin + 10, yPos, maxWidth, { fontSize: 10 })
+        yPos += 4
+      })
+    }
+
+    if (analysis.notes && String(analysis.notes).trim()) {
+      yPos += 5
+
+      if (yPos > pageHeight - 40) {
+        doc.addPage()
+        yPos = margin
+      }
+
+      doc.setDrawColor(229, 231, 235)
+      doc.line(margin, yPos, pageWidth - margin, yPos)
+      yPos += 10
+
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(55, 65, 81)
+      doc.text('Additional Notes', margin, yPos)
+      yPos += 8
+
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(75, 85, 99)
+      
+      const maxWidth = pageWidth - margin * 2
+      yPos = addText(String(analysis.notes), margin, yPos, maxWidth, { fontSize: 10 })
+    }
+
+    // Footer
+    const totalPages = doc.internal.getNumberOfPages()
+    
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      
+      doc.setDrawColor(229, 231, 235)
+      doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20)
+
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(156, 163, 175)
+      
+      doc.text(
+        'VOXA AI Handwriting Analysis • Not a medical diagnosis • Consult a professional',
+        margin,
+        pageHeight - 12
+      )
+
+      doc.text(
+        `Page ${i} of ${totalPages}`,
+        pageWidth - margin - 30,
+        pageHeight - 12
+      )
+
+      doc.setFontSize(8)
+      doc.text(
+        'This report is for screening purposes only. Please consult with a healthcare professional for formal diagnosis.',
+        margin,
+        pageHeight - 6
+      )
+    }
+
+    const date = new Date().toISOString().split('T')[0]
+    const filename = `VOXA_Analysis_${userName.replace(/[^a-zA-Z0-9]/g, '_')}_${date}.pdf`
+
+    doc.save(filename)
+
+    console.log('✅ PDF Report generated successfully')
+    return true
+
+  } catch (error) {
+    console.error('❌ PDF generation error:', error)
+    alert('Failed to generate PDF report. Please try again.')
+    return false
+  }
 }
+
+export default { generateAnalysisReport }

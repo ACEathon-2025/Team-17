@@ -34,19 +34,22 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('✅ Created uploads/handwriting directory')
 }
 
-// Middleware
+// ✅ CRITICAL: Configure Helmet BEFORE other middleware
 app.use(helmet({
   contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" } // ✅ NEW - Allow cross-origin resources
 }))
 
+// ✅ CRITICAL: CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? ['https://your-domain.com']
     : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Length', 'Content-Type'] // ✅ NEW - Expose headers
 }))
 
 // Rate Limiters
@@ -95,15 +98,39 @@ const analysisLimiter = rateLimit({
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// ✅ CRITICAL: Serve static uploads BEFORE API routes
-// This must come before any route handlers
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+// ✅ CRITICAL: Static file serving with CORS headers for images
+app.use('/uploads', (req, res, next) => {
+  // Set CORS headers for all uploaded files
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin')
+  res.header('Cross-Origin-Embedder-Policy', 'unsafe-none')
+  
+  // Handle OPTIONS preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  
+  next()
+}, express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Additional headers for images
+    if (filePath.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+      res.set('Cache-Control', 'public, max-age=31536000')
+      res.set('Content-Type', 'image/' + path.extname(filePath).slice(1))
+    }
+  }
+}))
+
 console.log('📁 Serving static files from:', path.join(__dirname, 'uploads'))
+console.log('🌐 CORS enabled for uploaded images')
 
 // Request logging middleware (development only)
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`)
+    const timestamp = new Date().toISOString()
+    console.log(`${timestamp} - ${req.method} ${req.path}`)
     next()
   })
 }
@@ -124,14 +151,32 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     message: 'VOXA API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || 'development',
     features: {
       aiAnalysis: 'Active (Client-Side)',
       translation: 'Active',
       summarization: 'Active',
       tts: 'Active',
-      fileUpload: 'Active'
+      fileUpload: 'Active',
+      cors: 'Enabled for images'
+    },
+    uploads: {
+      directory: uploadsDir,
+      accessible: fs.existsSync(uploadsDir)
     }
+  })
+})
+
+// Test image endpoint for debugging
+app.get('/api/test-image', (req, res) => {
+  const testImagePath = path.join(__dirname, 'uploads', 'handwriting')
+  const files = fs.existsSync(testImagePath) ? fs.readdirSync(testImagePath) : []
+  
+  res.json({
+    uploadsDirectory: testImagePath,
+    exists: fs.existsSync(testImagePath),
+    fileCount: files.length,
+    sampleFiles: files.slice(0, 5)
   })
 })
 
@@ -214,27 +259,30 @@ process.on('SIGTERM', gracefulShutdown)
 process.on('SIGINT', gracefulShutdown)
 
 const server = app.listen(PORT, () => {
-  console.log('\n' + '='.repeat(70))
+  console.log('\n' + '='.repeat(80))
   console.log('🚀 VOXA Server Successfully Started!')
-  console.log('='.repeat(70))
+  console.log('='.repeat(80))
   console.log(`📍 Port: ${PORT}`)
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
   console.log(`🔒 CORS: ${process.env.NODE_ENV === 'production' ? 'production domains' : 'localhost:5173, 5174, 3000'}`)
+  console.log(`🌐 CORS for Images: Enabled (cross-origin)`)
   console.log(`⚡ Rate Limiting: 1000 req/15min (general)`)
   console.log(`🧠 AI Analysis: 50 req/min (client-side processing)`)
   console.log(`📁 Uploads Directory: ${uploadsDir}`)
-  console.log('='.repeat(70))
+  console.log('='.repeat(80))
   console.log('📡 API Endpoints:')
   console.log(`   ✓ Health Check: http://localhost:${PORT}/api/health`)
+  console.log(`   ✓ Test Images: http://localhost:${PORT}/api/test-image`)
   console.log(`   ✓ Translation: http://localhost:${PORT}/api/translation`)
   console.log(`   ✓ AI Upload: http://localhost:${PORT}/api/analysis/upload`)
   console.log(`   ✓ AI Save: http://localhost:${PORT}/api/analysis/save`)
   console.log(`   ✓ Summarization: http://localhost:${PORT}/api/summarization`)
   console.log(`   ✓ Static Files: http://localhost:${PORT}/uploads/`)
-  console.log('='.repeat(70))
+  console.log('='.repeat(80))
   console.log('🧠 AI Processing: Client-Side (TensorFlow.js in Browser)')
+  console.log('🖼️  Image CORS: Configured for cross-origin access')
   console.log('✅ Server Ready for Requests!')
-  console.log('='.repeat(70) + '\n')
+  console.log('='.repeat(80) + '\n')
 })
 
 // Handle unhandled promise rejections

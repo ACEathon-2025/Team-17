@@ -1,3 +1,4 @@
+// client/src/pages/HandwritingAnalysis.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -607,24 +608,31 @@ const HandwritingAnalysis = () => {
                     <div className="text-8xl mb-4">{getRiskEmoji(result.riskLevel)}</div>
                     <h3 className="text-4xl font-black game-font mb-2" style={{
                       color: result.riskLevel === 'Low' ? '#16a34a' :
-                            result.riskLevel === 'Medium' ? '#ca8a04' : '#dc2626'
+                             result.riskLevel === 'Medium' ? '#ca8a04' : '#dc2626'
                     }}>
                       {result.riskLevel} Risk
                     </h3>
                     <p className="text-2xl font-bold fun-font" style={{
                       color: result.riskLevel === 'Low' ? '#15803d' :
-                            result.riskLevel === 'Medium' ? '#a16207' : '#b91c1c'
+                             result.riskLevel === 'Medium' ? '#a16207' : '#b91c1c'
                     }}>
                       {Math.round(result.confidence * 100)}% Confidence
                     </p>
                   </div>
                 </div>
-                {/* Action Buttons */}
+
+                {/* Action Buttons - ✅ FIXED: Properly pass age to PDF generator */}
                 <div className="flex flex-wrap gap-4">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => generateAnalysisReport(result, user?.name || user?.email)}
+                    onClick={() => {
+                      const userData = {
+                        name: user?.name || user?.email,
+                        age: result.age
+                      }
+                      generateAnalysisReport(result, userData)
+                    }}
                     className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold shadow-lg"
                   >
                     <Download className="h-5 w-5" />
